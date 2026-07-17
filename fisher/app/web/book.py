@@ -1,9 +1,10 @@
-from helper import is_isbn_or_key
-from yushu_book import YuShuBook
+from app.libs.helper import is_isbn_or_key
+from app.spider.yushu_book import YuShuBook
 from . import web_router 
 from typing import Annotated
 from pydantic import StringConstraints
 from fastapi import Query
+from app.setting import DEFAULT_PAGE_SIZE, PAGE_SIZE_MIN, PAGE_SIZE_MAX
 
 # 搜索关键字或 ISBN
 SearchQuery = Annotated[
@@ -16,8 +17,7 @@ SearchQuery = Annotated[
     # min_length 和 max_length 是字符串长度验证
     Query(
         ...,
-        description="搜索关键字或 ISBN",
-        example="活着",
+        description="搜索关键字或 ISBN"
     )
 ]
 
@@ -26,10 +26,16 @@ SearchQuery = Annotated[
 # ge 和 le 是数字范围验证
 Page = Annotated[int, Query(ge=1, le=999, description="页码，默认 1")]
 
+PageSize = Annotated[
+    int,
+    Query(ge=PAGE_SIZE_MIN, le=PAGE_SIZE_MAX, description="每页条数")
+]
+
 @web_router.get('/book/search')
 def search(
   q: SearchQuery,
   page: Page=1,
+  size: PageSize=DEFAULT_PAGE_SIZE,
 ):
   """ 
   ISBN搜索接口：https://data.isbn.work/openApi/getInfoByIsbn?isbn=9787115611833&appKey=
@@ -41,6 +47,6 @@ def search(
   if isbn_or_key == 'isbn':
     result = YuShuBook.search_by_isbn(q)
   else:
-    result = YuShuBook.search_by_keyword(q, page)
+    result = YuShuBook.search_by_keyword(q, page, size)
 
   return result

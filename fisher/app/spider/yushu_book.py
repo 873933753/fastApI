@@ -1,7 +1,10 @@
-from http_client import HTTP
+from app.libs.http_client import HTTP
 
 import os
 from dotenv import load_dotenv
+from app.setting import DEFAULT_PAGE_SIZE
+
+
 # 加载环境变量
 load_dotenv()
 # 获取环境变量
@@ -22,6 +25,6 @@ class YuShuBook:
     return HTTP.get(url)
 
   @classmethod
-  def search_by_keyword(cls, keyword, page=1, size=10):
+  def search_by_keyword(cls, keyword, page=1, size=DEFAULT_PAGE_SIZE):
     url = cls.keyword_url.format(keyword=keyword, page=page, size=size, appKey=APP_KEY)
     return HTTP.get(url)
