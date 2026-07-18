@@ -5,6 +5,7 @@ from typing import Annotated
 from pydantic import StringConstraints
 from fastapi import Query
 from app.setting import DEFAULT_PAGE_SIZE, PAGE_SIZE_MIN, PAGE_SIZE_MAX
+from app.view_models.book import BookCollectionViewModel
 
 # 搜索关键字或 ISBN
 SearchQuery = Annotated[
@@ -43,10 +44,17 @@ def search(
   q - 关键字和ISBN
   page - 页码
   """
+  # 包装书籍信息
+  books = BookCollectionViewModel()
   isbn_or_key = is_isbn_or_key(q)
+  yushu_book = YuShuBook()
+  
   if isbn_or_key == 'isbn':
-    result = YuShuBook.search_by_isbn(q)
+    # result = YuShuBook.search_by_isbn(q)
+    yushu_book.search_by_isbn(q)
   else:
-    result = YuShuBook.search_by_keyword(q, page, size)
+    # result = YuShuBook.search_by_keyword(q, page, size)
+    yushu_book.search_by_keyword(q, page, size)
 
-  return result
+  books.fill(yushu_book, q)
+  return books

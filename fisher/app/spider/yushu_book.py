@@ -18,13 +18,27 @@ class YuShuBook:
   isbn_url = 'https://front.zstcwx.cn/api/sysAboutUs/findInfo?isbn={isbn}&appKey={appKey}'
   keyword_url = 'https://front.zstcwx.cn/api/sysAboutUs/findInfo?current={page}&size={size}&bookName={keyword}&appKey={appKey}'
   
+  # 初始化书籍信息
+  def __init__(self):
+    self.total = 0
+    self.books = []
 
-  @classmethod
-  def search_by_isbn(cls, isbn):
-    url = cls.isbn_url.format(isbn=isbn, appKey=APP_KEY)
-    return HTTP.get(url)
+  # __是私有方法
+  def __fill_single(self,data):
+    if data:
+      self.total = 1
+      self.books.append(data)
 
-  @classmethod
-  def search_by_keyword(cls, keyword, page=1, size=DEFAULT_PAGE_SIZE):
-    url = cls.keyword_url.format(keyword=keyword, page=page, size=size, appKey=APP_KEY)
-    return HTTP.get(url)
+  def __fill_collection(self,data):
+    self.total = data['total']
+    self.books = data['records']
+
+  def search_by_isbn(self, isbn):
+    url = self.isbn_url.format(isbn=isbn, appKey=APP_KEY)
+    result = HTTP.get(url)
+    self.__fill_single(result)
+
+  def search_by_keyword(self, keyword, page=1, size=DEFAULT_PAGE_SIZE):
+    url = self.keyword_url.format(keyword=keyword, page=page, size=size, appKey=APP_KEY)
+    result = HTTP.get(url)
+    self.__fill_collection(result)

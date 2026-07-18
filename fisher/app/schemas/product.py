@@ -1,0 +1,23 @@
+from typing import List, Union
+
+from pydantic import BaseModel, Field
+
+
+class ProductItem(BaseModel):
+    id: str
+    productName: str
+    productSubtitle: str = ''
+    salePrice: Union[str, float, int] = ''
+    orgPrice: float = 0
+    stock: int = 0
+    image: str = ''
+
+
+class ProductSearchData(BaseModel):
+    keyword: str
+    page: int
+    size: int
+    total: int
+    pages: int = 0
+    type: str = Field(description='single 或 list')
+    items: List[ProductItem]

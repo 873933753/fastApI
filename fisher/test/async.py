@@ -9,7 +9,6 @@ app = FastAPI()
 async def async_func():
   print("async_func start")
   start_time = time.time()
-  # 这是异步的同步写法
   # await asyncio.sleep(1)  # 
   # await asyncio.sleep(1)  # 
   # await asyncio.sleep(1)  # 
@@ -17,12 +16,12 @@ async def async_func():
   # await asyncio.sleep(1)  # 
 
   # 这是异步的异步写法，5个sleep并发执行
+  # asyncio.gather() — 等待多个任务
+  # 所有协程并发执行，全部完成后返回结果列表。某个任务抛异常时，默认会取消其余任务。
   await asyncio.gather(
         asyncio.sleep(1),
         asyncio.sleep(1),
-        asyncio.sleep(1),
-        asyncio.sleep(1),
-        asyncio.sleep(1),
+        asyncio.sleep(1)
   )
   # f-string 格式化输出
   end_time = time.time()
@@ -65,3 +64,23 @@ if __name__ == "__main__":
   # 运行 FastAPI 应用
   # "async:app" 表示当前模块为 async.py，应用实例为 app
   uvicorn.run("async:app", host="127.0.0.1", port=8002, reload=True)
+
+
+
+
+  """ 
+  === 顺序执行（一个接一个）===
+  A开始，要等1秒
+  A结束
+  B开始，要等1秒
+  B结束
+  顺序执行完毕
+
+  === 并发执行（同时开始）===
+  C开始，要等1秒
+  D开始，要等1秒
+  C结束
+  D结束
+  并发执行完毕
+  
+   """
