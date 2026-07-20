@@ -67,9 +67,15 @@ class YuShuProduct:
         result = HTTP.post(
             url,
             json={
-                'productNames': keyword,
+                'productName': keyword,
                 'dictIds': '',
             },
         )
         body = self.__handle_result(result)
         self.__fill_collection(body)
+
+    # 获取第一条数据 - 详情
+    # property装饰器 - 将方法转换为属性
+    @property
+    def first(self):
+      return self.list[0] if self.total > 0 else None

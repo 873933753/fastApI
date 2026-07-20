@@ -11,6 +11,7 @@ class ProductViewModel:
 
     @classmethod
     def from_record(cls, record: dict) -> ProductItem:
+        print('record---',record)
         return ProductItem(
             id=str(record.get('id', '')),
             productName=record.get('productName', ''),

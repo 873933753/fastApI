@@ -13,3 +13,8 @@ class SpiderError(AppError):
 
     def __init__(self, message: str, code: int = 50001):
         super().__init__(message, code=code, http_status=502)
+
+# class EmailAlreadyExistsError(AppError):
+#     """邮箱已存在时抛出"""
+#     def __init__(self, message: str, code: int = 40001):
+#         super().__init__(message, code=code, http_status=400)

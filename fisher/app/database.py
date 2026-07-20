@@ -18,10 +18,13 @@ def init_db():
     """应用启动时根据模型自动建表（开发阶段使用，生产建议用 Alembic 迁移）"""
     # 必须导入模型，否则 metadata 中无表定义，create_all 不会建表
     from app.models.book import Book  # noqa: F401
+    from app.models.gift import Gift  # noqa: F401
+    from app.models.user import User  # noqa: F401
+    
 
     SQLModel.metadata.create_all(engine)
 
-
+# 获取数据库会话，供路由通过 Depends(get_session) 注入使用
 def get_session():
     """
     数据库会话依赖，供路由通过 Depends(get_session) 注入使用。

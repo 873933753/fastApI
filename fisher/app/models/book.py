@@ -1,9 +1,10 @@
 # app/models/book.py
 from typing import Optional
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field
+from app.models.base import BaseModel   
 
 # 书籍模型
-class Book(SQLModel, table=True):
+class Book(BaseModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True) # 主键，自动递增，primary_key=True不会重复
     title: str = Field(max_length=50) # 标题，最大长度50
     author: str = Field(default="未名", max_length=30) # 作者，最大长度30
