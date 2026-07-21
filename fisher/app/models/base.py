@@ -1,8 +1,16 @@
 from sqlmodel import SQLModel, Field
+from datetime import datetime
 
 # 基类模型 - 所有模型都继承自这个基类
 class BaseModel(SQLModel):
   is_deleted: bool = Field(default=False) # 是否删除,默认未删除
+  # Unix 时间戳（秒）
+  # 为模型添加创建时间，默认当前时间
+  create_time: int = Field(
+      default_factory=lambda: int(datetime.now().timestamp())
+  )
+
+
 
   # attrs_dict: 字典，键为属性名，值为属性值
   def set_attrs(self, attrs_dict: dict):

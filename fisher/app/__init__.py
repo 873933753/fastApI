@@ -33,3 +33,7 @@ def create_app():
 def register_apirouter(app):
   from app.web import web_router
   app.include_router(web_router)
+
+  # 注册test路由
+  from test import test_router
+  app.include_router(test_router)

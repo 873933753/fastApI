@@ -2,6 +2,9 @@
 from sqlmodel import SQLModel, create_engine, Session
 from app.secure import DATABASE_URL
 
+# 上下文管理器
+from contextlib import contextmanager
+
 # SQLite 多线程下需要 check_same_thread=False；MySQL 不需要额外 connect_args
 connect_args = (
     {"check_same_thread": False}
@@ -20,6 +23,7 @@ def init_db():
     from app.models.book import Book  # noqa: F401
     from app.models.gift import Gift  # noqa: F401
     from app.models.user import User  # noqa: F401
+    from app.models.wish import Wish  # noqa: F401
     
 
     SQLModel.metadata.create_all(engine)
@@ -46,3 +50,14 @@ def get_session():
     # 所以注释里写“无需手动 session.close()”——with 帮你做了这件事。
     with Session(engine) as session:
         yield session
+
+# 上下文管理器：块成功则 commit，失败则 rollback 再抛出。
+@contextmanager
+def auto_commit(session: Session):
+    """业务写库时使用：块成功则 commit，失败则 rollback 再抛出。"""
+    try:
+        yield
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise e

@@ -18,7 +18,8 @@ def _to_int(value, default=0):
 
 
 class YuShuProduct:
-    isbn_url = 'https://front.zstcwx.cn/api/sysAboutUs/findInfo?isbn={isbn}&appKey={appKey}'
+    # isbn_url = 'https://front.zstcwx.cn/api/sysAboutUs/findInfo?isbn={isbn}&appKey={appKey}'
+    isbn_url = 'https://front.zstcwx.cn/api/product/queryByDictPage?current={page}&size={size}&bookName={keyword}&appKey={appKey}'
     keyword_url = 'https://front.zstcwx.cn/api/product/queryByDictPage?current={page}&size={size}&bookName={keyword}&appKey={appKey}'
 
     def __init__(self):
@@ -69,6 +70,8 @@ class YuShuProduct:
             json={
                 'productName': keyword,
                 'dictIds': '',
+                'current': page,
+                'size': size,
             },
         )
         body = self.__handle_result(result)

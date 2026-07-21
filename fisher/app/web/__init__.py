@@ -4,9 +4,17 @@ from fastapi import APIRouter
 # prefix - 设置前缀 /web，所有路由都会以 /web 开头
 web_router = APIRouter(prefix='/web')
 
+
 # 导入book路由
 from app.web import book 
 from app.web import product
 from app.web import test_html
 # 导入auth路由
 from app.web import auth
+
+# 导入gift路由
+from app.web.gift import gift_router
+# 将gift路由挂到web_router
+web_router.include_router(gift_router)
+
+

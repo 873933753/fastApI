@@ -37,6 +37,7 @@ class RegisterForm(BaseModel):
     @field_validator("password")
     @classmethod
     def validate_password(cls, v: str) -> str:
+        v = (v or "").strip()
         if not v:
             raise ValueError("密码不可以为空，请输入你的密码")
         if len(v) < 6 or len(v) > 32:
@@ -52,3 +53,24 @@ class RegisterForm(BaseModel):
         if len(v) < 2 or len(v) > 10:
             raise ValueError("昵称至少需要两个字符，最多10个字符")
         return v
+
+class LoginForm(BaseModel):
+    email: str
+    password: str
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        # 去空格
+        v = (v or "").strip()
+        if not v:
+            raise ValueError('请输入正确的邮箱')
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        v = (v or "").strip()
+        if not v:
+            raise ValueError("密码不可以为空，请输入你的密码")
+        return v   

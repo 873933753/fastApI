@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from app.libs.exceptions import AppError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+import logging
 
 def register_exception_handlers(app: FastAPI) -> None:
     # 应用错误处理 - 自定义异常
@@ -30,6 +32,34 @@ def register_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    # 数据库写入失败处理
+    # IntegrityError 是 SQLAlchemy 内置的异常类，用于处理数据库写入失败的情况
+    # 当数据库写入失败时，会抛出 IntegrityError 异常
+    @app.exception_handler(IntegrityError)
+    async def integrity_error_handler(request: Request, exc: IntegrityError):
+        # 可在这里 log.exception(exc)
+        return JSONResponse(
+            status_code=400,  # 或 409，看你语义
+            content={
+                "code": 40010,
+                "message": "数据写入失败，请稍后重试",
+                "data": None,
+            },
+        )
+    # SQLAlchemyError 是 SQLAlchemy 内置的异常类，用于处理数据库查询失败的情况
+    @app.exception_handler(SQLAlchemyError)
+    async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
+        # 记录异常日志
+        logging.exception(exc)
+        return JSONResponse(
+            status_code=500,
+            content={
+                "code": 50010,
+                "message": "服务繁忙，请稍后重试",
+                "data": None,
+            },
+        )
+
 # 获取第一个参数校验失败的消息
 # 只取第一条错误,多个字段同时出错时，只返回第一个 message。对注册表单通常够用
 # 私有方法 - 只用于内部使用
@@ -37,8 +67,15 @@ def _first_validation_message(exc: RequestValidationError) -> str:
     errors = exc.errors()
     if not errors:
         return "参数校验失败"
-    msg = errors[0].get("msg", "参数校验失败")
-    # 去掉 Pydantic 自带的 "Value error, " 前缀
+
+    err = errors[0]
+
+    # 字段缺失 → 统一中文
+    if err.get("type") == "missing":
+        return "参数缺失"
+
+    msg = err.get("msg", "参数校验失败")
     if msg.startswith("Value error, "):
         msg = msg[len("Value error, "):]
     return msg
+

@@ -7,8 +7,8 @@ from app.models.base import BaseModel
 if TYPE_CHECKING:
     from app.models.user import User
 
-# 礼物模型
-class Gift(BaseModel, table=True):
+# 心愿清单
+class Wish(BaseModel, table=True):
   id: Optional[int] = Field(default=None, primary_key=True)
   launched: bool = Field(default=False) # 是否赠送,默认未赠送
 

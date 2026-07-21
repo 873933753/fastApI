@@ -11,7 +11,6 @@ class ProductViewModel:
 
     @classmethod
     def from_record(cls, record: dict) -> ProductItem:
-        print('record---',record)
         return ProductItem(
             id=str(record.get('id', '')),
             productName=record.get('productName', ''),
@@ -20,6 +19,7 @@ class ProductViewModel:
             orgPrice=float(record.get('orgPrice') or 0),
             stock=int(record.get('stock') or 0),
             image=cls._first_image(record),
+            isbn=record.get('productName', ''),  # 原始 productName → isbn
         )
 
 

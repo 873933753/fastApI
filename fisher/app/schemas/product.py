@@ -11,6 +11,7 @@ class ProductItem(BaseModel):
     orgPrice: float = 0
     stock: int = 0
     image: str = ''
+    isbn: str
 
 
 class ProductSearchData(BaseModel):
@@ -20,4 +21,11 @@ class ProductSearchData(BaseModel):
     total: int
     pages: int = 0
     type: str = Field(description='single 或 list')
+    items: List[ProductItem]
+
+class ProductListData(BaseModel):
+    page: int
+    size: int
+    total: int
+    pages: int = 0
     items: List[ProductItem]

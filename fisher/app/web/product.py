@@ -4,12 +4,13 @@ from fastapi import Query
 from pydantic import StringConstraints
 
 from app.libs.helper import is_isbn_or_key
-from app.schemas.product import ProductSearchData, ProductItem
+from app.schemas.product import ProductSearchData, ProductItem, ProductListData
 from app.schemas.response import ApiResponse
 from app.setting import DEFAULT_PAGE_SIZE, PAGE_SIZE_MAX, PAGE_SIZE_MIN
 from app.spider.yushu_product import YuShuProduct
 from app.view_models.product import ProductCollectionViewModel, ProductViewModel
 from . import web_router
+from pydantic import BaseModel
 
 SearchQuery = Annotated[
     str,
@@ -56,3 +57,22 @@ def detail(isbn: str):
     # 查到 → 转换为 ProductItem
     product = ProductViewModel.from_record(record)
     return ApiResponse(data=product)
+
+
+# 列表查询参数模型，body传
+#  Pydantic 模型
+class ProductListQuery(BaseModel):
+    page: int = 1
+    size: int = DEFAULT_PAGE_SIZE
+
+# 列表接口 - 分页查询
+@web_router.post('/product/list', response_model=ApiResponse[ProductListData])
+def list(query: ProductListQuery):
+    page = query.page
+    size = query.size
+    yushu_product = YuShuProduct()
+    yushu_product.search_by_keyword("", page, size)
+    products = ProductCollectionViewModel()
+    products.fill(yushu_product, "", page, size)
+    return ApiResponse(data=products.data)
+
