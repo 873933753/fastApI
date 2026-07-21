@@ -1,16 +1,24 @@
 from typing import Annotated, Any
 
-from fastapi import Query
+from fastapi import Query,Depends
 from pydantic import StringConstraints
+from sqlmodel import Session
 
 from app.libs.helper import is_isbn_or_key
 from app.schemas.product import ProductSearchData, ProductItem, ProductListData
+from app.schemas.trade import TradeListData
 from app.schemas.response import ApiResponse
 from app.setting import DEFAULT_PAGE_SIZE, PAGE_SIZE_MAX, PAGE_SIZE_MIN
 from app.spider.yushu_product import YuShuProduct
 from app.view_models.product import ProductCollectionViewModel, ProductViewModel
 from . import web_router
 from pydantic import BaseModel
+from app.view_models.trade import TradeInfo
+from app.database import get_session
+from app.models.user import User
+from app.libs.auth import get_current_user
+from app.services.trade import get_trade_list as get_trade_list_service
+
 
 SearchQuery = Annotated[
     str,
@@ -76,3 +84,31 @@ def list(query: ProductListQuery):
     products.fill(yushu_product, "", page, size)
     return ApiResponse(data=products.data)
 
+
+CurrentSession = Annotated[Session, Depends(get_session)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
+
+# 获取该商品的所有赠送清单
+# @web_router.get('/product/gift', response_model=ApiResponse[TradeListData])
+# def get_gift_list(isbn: str, session: CurrentSession):
+#     gifts = session.exec(
+#         select(Gift).where(
+#             Gift.isbn == isbn,
+#             Gift.launched == False,
+#         )
+#     ).all()
+#     trade_data = TradeInfo(gifts).to_schema()
+#     return ApiResponse(data=trade_data)
+
+
+
+# 判断用户是赠送者还是接受者
+@web_router.get('/product/trade/list', response_model=ApiResponse[TradeListData])
+def get_trade_list(
+    isbn: str, 
+    session: CurrentSession,
+    current_user: CurrentUser
+):
+    user_type, list = get_trade_list_service(session, current_user.id, isbn)
+    trade_data = TradeInfo(list).to_schema(user_type=user_type)
+    return ApiResponse(data=trade_data)

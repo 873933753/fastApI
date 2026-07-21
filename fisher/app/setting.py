@@ -7,3 +7,6 @@ PAGE_SIZE_MAX = 100
 
 # 默认每次添加商品获取50 bean
 BEAN_PER_GIFT = 50
+
+# 首页最近赠送礼物条数
+RECENT_GIFT_COUNT = 5

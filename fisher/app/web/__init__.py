@@ -17,4 +17,11 @@ from app.web.gift import gift_router
 # 将gift路由挂到web_router
 web_router.include_router(gift_router)
 
+# 导入wish路由
+from app.web.wish import wish_router
+# 将wish路由挂到web_router
+web_router.include_router(wish_router)
+
+# 导入index路由
+from app.web import index
 

@@ -1,6 +1,9 @@
 # 数据库连接与会话管理
 from sqlmodel import SQLModel, create_engine, Session
 from app.secure import DATABASE_URL
+from sqlalchemy import event
+from sqlalchemy.orm import with_loader_criteria
+from app.models.base import BaseModel
 
 # 上下文管理器
 from contextlib import contextmanager
@@ -61,3 +64,21 @@ def auto_commit(session: Session):
     except Exception as e:
         session.rollback()
         raise e
+ 
+# 监听SQL执行，过滤软删除数据
+# 只查询未删除的数据
+@event.listens_for(Session, "do_orm_execute")
+def _filter_soft_deleted(execute_state):
+    if (
+        execute_state.is_select
+        and not execute_state.is_column_load
+        and not execute_state.is_relationship_load
+        and not execute_state.execution_options.get("include_deleted", False)
+    ):
+        execute_state.statement = execute_state.statement.options(
+            with_loader_criteria(
+                BaseModel,
+                lambda cls: cls.is_deleted == 0,
+                include_aliases=True,
+            )
+        )

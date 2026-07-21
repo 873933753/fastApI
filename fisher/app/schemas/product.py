@@ -1,6 +1,7 @@
 from typing import List, Union
 
 from pydantic import BaseModel, Field
+from app.libs.helper import FormattedDateTime
 
 
 class ProductItem(BaseModel):
@@ -29,3 +30,6 @@ class ProductListData(BaseModel):
     total: int
     pages: int = 0
     items: List[ProductItem]
+
+class HomeGiftItem(ProductItem):
+    create_time: FormattedDateTime

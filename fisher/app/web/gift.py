@@ -101,10 +101,7 @@ def save_to_gifts(
   # product = ProductViewModel.from_record(record)
   # return ApiResponse(data=product,message='添加成功',code=200) # 返回商品信息
 
-# 获取赠送清单
-@gift_router.get('/list', response_model=ApiResponse[Any])
-def get_gifts():
-  pass
+
 
 @gift_router.delete('/delete/{isbn}', response_model=ApiResponse[Any])
 def delete_from_gifts():
