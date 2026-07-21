@@ -5,6 +5,8 @@ from app.models.base import BaseModel
 from sqlmodel import Session, select, func
 from app.spider.yushu_product import YuShuProduct
 from app.setting import RECENT_GIFT_COUNT
+from typing import List
+from app.models.wish import Wish
 
 # TYPE_CHECKING - 类型检查，避免循环导入
 if TYPE_CHECKING:
@@ -75,3 +77,37 @@ class Gift(BaseModel, table=True):
       .order_by(Gift.create_time.desc())  # 按创建时间排序，最近创建的在前
       .limit(RECENT_GIFT_COUNT)           # 只取配置的条数
     ).all()
+
+  
+  # 获取当前用户的赠送清单
+  # 用@classmethod装饰器，将my_gifts方法变成一个类方法
+  # 与静态方法的区别是：类方法可以访问类属性，而静态方法不能访问类属性
+  @classmethod
+  def my_gifts(cls, session: Session, user_id: int):
+    return session.exec(
+      select(cls)
+      .where(cls.user_id == user_id)
+      .order_by(cls.create_time.desc())
+    ).all()
+
+  # 获取每个礼物想要的人数
+  # 传入isbn列表，返回每个isbn的想要人数
+  @classmethod
+  def get_wish_count(cls, session: Session, isbn_list: List[str]):
+    if not isbn_list:
+        return []
+    count_list = session.exec(
+        select(
+          Wish.isbn, # 想要的人的isbn
+          func.count(Wish.id) # 想要的人数,count(Wish.id) 会返回一个整数
+        )
+        .where(
+            Wish.launched == False,
+            Wish.isbn.in_(isbn_list) # 想要的人的isbn在isbn_list中
+        )
+        # 按isbn分组，group_by(Wish.isbn) 会返回一个列表
+        # 列表中每个元素是一个元组，元组中第一个元素是isbn，第二个元素是想要的人数
+        .group_by(Wish.isbn) 
+    ).all()
+    # [(isbn, count), ...] → [{'isbn': ..., 'count': ...}, ...]
+    return [{"isbn": isbn, "count": count} for isbn, count in count_list]

@@ -9,6 +9,7 @@ from app.models.gift import Gift
 from app.setting import BEAN_PER_GIFT
 from pydantic import BaseModel, Field
 from app.libs.exceptions import AppError
+from app.view_models.gift import MyGiftData, MyGifts
 
 # 子路由：/gift 前缀 + 全局鉴权
 gift_router = APIRouter(
@@ -102,7 +103,14 @@ def save_to_gifts(
   # return ApiResponse(data=product,message='添加成功',code=200) # 返回商品信息
 
 
+# 获取当前用户的赠送清单
+@gift_router.get('/myList', response_model=ApiResponse[MyGiftData])
+def get_gifts(session: CurrentSession, current_user: CurrentUser):
+  gifts = Gift.my_gifts(session, current_user.id)
+  # 获取每个礼物的isbn列表
+  isbn_list = [gift.isbn for gift in gifts]
+  # 获取每个礼物的想要人数
+  wish_counts_list = Gift.get_wish_count(session, isbn_list)
+  wish_count = {item["isbn"]: item["count"] for item in wish_counts_list}
 
-@gift_router.delete('/delete/{isbn}', response_model=ApiResponse[Any])
-def delete_from_gifts():
-  pass
+  return ApiResponse(data=MyGifts(gifts, wish_count).to_schema())
