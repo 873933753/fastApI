@@ -10,3 +10,6 @@ BEAN_PER_GIFT = 50
 
 # 首页最近赠送礼物条数
 RECENT_GIFT_COUNT = 5
+
+# 验证码过期时间，单位：秒,默认5分钟
+RESET_PASSWORD_CODE_TTL = 60 * 5

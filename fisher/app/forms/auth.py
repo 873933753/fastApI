@@ -88,3 +88,29 @@ class ResetPasswordForm(BaseModel):
         if password is not None and v != password:
             raise ValueError("两次密码不一致")
         return v
+
+class VerifyCodeForm(BaseModel):
+    email: Email
+    code: str
+    @field_validator("code")
+    @classmethod
+    def validate_code(cls, v: str) -> str:
+        v = (v or "").strip()
+        if not v:
+            raise ValueError("验证码不可以为空")
+        if len(v) != 6:
+            raise ValueError("验证码长度为6位")
+        return v
+
+class ResetPasswordTokenForm(BaseModel):
+    reset_token: str
+    new_password: Password
+    confirm_password: Password
+    
+    @field_validator("confirm_password")
+    @classmethod
+    def validate_confirm_password(cls, v: str, info: ValidationInfo) -> str:
+        password = (info.data or {}).get("new_password")
+        if password is not None and v != password:
+            raise ValueError("两次密码不一致")
+        return v

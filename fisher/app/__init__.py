@@ -11,8 +11,12 @@ from fastapi.staticfiles import StaticFiles
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     from app.database import init_db
+    from app.libs.redis import get_redis_client
     init_db()  # 开发阶段可用；生产建议用 Alembic
+
+    get_redis_client().ping()  # 启动时确认 Redis 可用
     yield
+    get_redis_client().close()  # 关闭连接池
 
 def create_app():
   app = FastAPI(lifespan=lifespan)

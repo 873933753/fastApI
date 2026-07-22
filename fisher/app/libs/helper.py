@@ -35,3 +35,9 @@ def format_datetime(v: Any) -> Any:
 
 # 用于 Pydantic 字段：传入 int/datetime，输出格式化字符串
 FormattedDateTime = Annotated[str, BeforeValidator(format_datetime)]
+
+import random
+import string
+#生成验证码，默认6位，纯数字
+def generate_verify_code(length: int = 6) -> str:
+    return "".join(random.choices(string.digits, k=length))

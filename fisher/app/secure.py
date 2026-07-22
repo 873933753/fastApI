@@ -19,3 +19,6 @@ MAIL_USE_SSL = True
 MAIL_USERNAME =  os.getenv("MAIL_USERNAME")
 MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
 MAIL_SENDER = f"Hanber <{MAIL_USERNAME}>"
+
+# redis配置
+REDIS_URL = os.getenv("REDIS_URL")

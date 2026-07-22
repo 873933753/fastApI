@@ -85,7 +85,7 @@ class User(BaseModel, table=True):
     ).first()
 
   # 生成token - 链接上的
-  def generate_token(self,expiration: int = 600) -> str:
+  def generate_token(self,expiration: int = 300) -> str:
     from app.libs.security import create_reset_token
     return create_reset_token(self.id, expiration)
 

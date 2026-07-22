@@ -14,13 +14,15 @@ from app.schemas.user import UserInfo,LoginResult
 # 导入生成访问令牌和登录结果模型
 from app.libs.security import create_access_token
 from app.libs.auth import get_current_user
-from app.forms.auth import EmailForm,ResetPasswordForm
+from app.forms.auth import EmailForm,ResetPasswordForm,VerifyCodeForm,ResetPasswordTokenForm
+from app.libs.security import create_reset_token,decode_reset_token
+from app.setting import RESET_PASSWORD_CODE_TTL
 
 
 """ 
 客户端 POST /register
     ↓
-FastAPI 用 RegisterForm 解析请求体
+FastAPI 用 RegisterForm 解析请求体  
     ↓
 校验失败 → 抛 RequestValidationError → handlers.py 返回 422
     ↓
@@ -170,4 +172,111 @@ def reset_password(
 
 
 
-    # 忘记密码 - 发送邮箱验证码
+# 忘记密码 - 发送邮箱验证码================================================
+@web_router.post('/forgetPassword/sendCode', response_model=ApiResponse[dict])
+def forgetPassword_sendCode(
+  form: EmailForm,
+  background_tasks: BackgroundTasks,
+  session: Session = Depends(get_session)
+):
+    user = User.get_user_by_email(session, form.email)
+    if not user:
+      raise AppError("邮箱不存在", code=40003, http_status=400)
+
+    from app.libs.email import send_email_safe
+    from app.libs.helper import generate_verify_code
+    from app.libs.redis import redis_client
+    from app.libs.redis import reset_password_code_key
+    # 邮箱存在，后台发送重置密码邮件
+    code = generate_verify_code()
+    # 将验证码存入redis
+    redis_client.set(
+      reset_password_code_key(user.id), 
+      code,
+      ex=RESET_PASSWORD_CODE_TTL
+    )
+
+    background_tasks.add_task(
+      send_email_safe,
+      to=form.email,
+      # to='tang_tk001@outlook.comxxx',
+      subject="重置你的密码",
+      template="email/reset_password_code.html",
+      user={"email": form.email},
+      code=code,
+    )
+    return ApiResponse(
+      data={
+        "code": code
+      },
+      message="验证码已发送，请查收邮箱"
+    )
+
+# 验证验证码，返回reset_token
+@web_router.post('/forgetPassword/verifyCode', response_model=ApiResponse[dict])
+def forgetPassword_verifyCode(
+  form: VerifyCodeForm,
+  session: Session = Depends(get_session)
+):
+    user = User.get_user_by_email(session, form.email)
+    if not user:
+      raise AppError("邮箱不存在", code=40003, http_status=400)
+    
+    from app.libs.redis import redis_client
+    from app.libs.redis import reset_password_code_key
+    
+    # 校验验证码
+    stored_code = redis_client.get(reset_password_code_key(user.id))
+
+    if not stored_code or stored_code != form.code:
+      raise AppError("验证码错误", code=40004, http_status=400)
+
+    # 删除验证码
+    redis_client.delete(reset_password_code_key(user.id))
+
+    # 返回reset_token
+    # reset_token = user.generate_token()
+
+    # 创建reset_token并存入redis
+    reset_token, jti = create_reset_token(user.id, expiration=600)
+    redis_client.set(
+        f"reset_password_jti:{jti}",
+        user.id,
+        ex=RESET_PASSWORD_CODE_TTL,  # 与 token 过期时间一致
+    )
+
+    return ApiResponse(
+      data={
+        # 测试用
+        "reset_token": reset_token,
+        # "jti": f"reset_password_jti:{jti}"
+      },message="验证码验证成功"
+    )
+
+# 校验凭证+重置密码
+@web_router.post('/forgetPassword/resetPassword', response_model=ApiResponse[dict])
+def forgetPassword_resetPassword(
+  form: ResetPasswordTokenForm,
+  session: Session = Depends(get_session)
+):
+    from app.libs.redis import redis_client
+
+    result  = decode_reset_token(form.reset_token)
+    if not result :
+      raise AppError("凭证无效或已过期", code=40004, http_status=400)
+
+    user_id, jti = result
+    # 删除redis中的user_id的key
+    # 从redis中获取user_id
+    key = f"reset_password_jti:{jti}"
+    # GET + DEL 原子操作，防止并发重复提交
+    stored_user_id = redis_client.getdel(key)
+    if not stored_user_id or int(stored_user_id) != user_id:
+        raise AppError("凭证无效或已过期", code=40004)
+
+    # 重置密码
+    user = session.get(User, user_id)
+    user.reset_password(form.new_password, session)
+
+    # 删除reset_token
+    return ApiResponse(data={},message="密码重置成功")
