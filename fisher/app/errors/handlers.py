@@ -4,6 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from app.libs.exceptions import AppError
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 import logging
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 def register_exception_handlers(app: FastAPI) -> None:
     # 应用错误处理 - 自定义异常
@@ -56,6 +57,21 @@ def register_exception_handlers(app: FastAPI) -> None:
             content={
                 "code": 50010,
                 "message": "服务繁忙，请稍后重试",
+                "data": None,
+            },
+        )
+
+    # 处理HTTP异常，比如404
+    @app.exception_handler(StarletteHTTPException)
+    async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+        # 可按 status_code 细分文案 / 业务码
+        message = "接口不存在" if exc.status_code == 404 else (exc.detail or "请求失败")
+        code = 40400 if exc.status_code == 404 else exc.status_code * 100
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "code": code,
+                "message": message,
                 "data": None,
             },
         )

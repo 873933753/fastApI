@@ -1,3 +1,4 @@
+import stat
 from sqlmodel import Field
 from typing import Optional
 from app.models.base import BaseModel
@@ -72,6 +73,42 @@ class User(BaseModel, table=True):
     if wish or gift:
       return False
     return True
+
+
+  # 按照邮箱查询用户
+  @classmethod
+  def get_user_by_email(cls, session: Session, email: str) -> Optional[User]:
+    return session.exec(
+      select(cls).where(cls.email == email)
+    # first_or_none() - 如果查询结果为空，则返回 None
+    # first() - 如果查询结果为空，则抛出异常
+    ).first()
+
+  # 生成token - 链接上的
+  def generate_token(self,expiration: int = 600) -> str:
+    from app.libs.security import create_reset_token
+    return create_reset_token(self.id, expiration)
+
+  # 验证token是否有效
+  @classmethod
+  def validate_token(cls, session, token):
+      from app.libs.security import decode_reset_token
+      user_id = decode_reset_token(token)
+      if not user_id:
+          raise AppError("token无效", code=40004)
+      user = session.get(cls, user_id)
+      if not user:
+          raise AppError("用户不存在", code=40005)
+      return user
+
+  # 重置密码
+  def reset_password(self, new_password: str, session: Session) -> None:
+    # 1、验证token是否有效
+    from app.database import auto_commit
+    from app.libs.security import hash_password
+    self.password_hash = hash_password(new_password)
+    with auto_commit(session):
+      session.add(self)
 
 
 

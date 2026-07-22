@@ -32,3 +32,22 @@ def decode_access_token(token: str) -> int | None:
         return int(payload["sub"])
     except jwt.PyJWTError:
         return None
+
+# 生成重置密码token
+# 参数：用户id，过期时间（默认10分钟）
+def create_reset_token(user_id: int, expiration: int = 600) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(seconds=expiration)
+    payload = {
+        "sub": str(user_id),
+        "type": "reset_password",  # 区分登录 JWT
+        "exp": expire,
+    }
+    return jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+def decode_reset_token(token: str) -> int | None:
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        if payload.get("type") != "reset_password":
+            return None
+        return int(payload["sub"])
+    except jwt.PyJWTError:
+        return None
