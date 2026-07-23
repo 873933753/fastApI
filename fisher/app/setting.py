@@ -13,3 +13,5 @@ RECENT_GIFT_COUNT = 5
 
 # 验证码过期时间，单位：秒,默认5分钟
 RESET_PASSWORD_CODE_TTL = 60 * 5
+# 同一邮箱发送验证码冷却时间（秒）
+RESET_PASSWORD_SEND_COOLDOWN = 60

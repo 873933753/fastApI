@@ -78,6 +78,9 @@ class Gift(BaseModel, table=True):
       .limit(RECENT_GIFT_COUNT)           # 只取配置的条数
     ).all()
 
+  # 判断是否是自己的礼物
+  def is_yourself_gift(self, user_id:int):
+    return True if self.user_id == user_id else False
   
   # 获取当前用户的赠送清单
   # 用@classmethod装饰器，将my_gifts方法变成一个类方法

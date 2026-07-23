@@ -2,7 +2,7 @@ import stat
 from sqlmodel import Field
 from typing import Optional
 from app.models.base import BaseModel
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String,func
 from sqlmodel import Session, select
 from app.models.gift import Gift
 from app.models.wish import Wish
@@ -28,8 +28,8 @@ class User(BaseModel, table=True):
   email: str = Field(max_length=50, unique=True)
   confirmed: bool = Field(default=False)
   beans: int = Field(default=0)
-  send_counter: int = Field(default=0)
-  receive_counter: int = Field(default=0)
+  send_counter: int = Field(default=0) # 赠送次数
+  receive_counter: int = Field(default=0) # 索取次数
   wx_open_id: Optional[str] = Field(default=None, max_length=50)
   wx_name: Optional[str] = Field(default=None, max_length=32)
   # 修改password字段为password_hash字段，数据库中是password字段，模型中是password_hash字段
@@ -37,6 +37,41 @@ class User(BaseModel, table=True):
   password_hash: str = Field(
     sa_column=Column("password", String(128), nullable=False)
   )
+
+  # 用于展示当前礼物的用户信息
+  @property
+  def summary(self) -> dict:
+    return {
+      'nickname': self.nickname,
+      'email': self.email,
+      'beans': self.beans,
+      'send_counter': self.send_counter,
+      'receive_counter': self.receive_counter,
+    }
+
+  # 判断鱼豆是否 > 1
+  def can_request_gift_beans(self) -> bool:
+    return True if self.beans > 1 else False
+  # 每两次索要必须送出一本
+  def can_send_gift(self, session: Session) -> bool:
+    from app.models.drift import Drift
+    from app.libs.enums import DriftStatus
+
+    success_send_counter = session.exec(
+        select(func.count()).select_from(Gift).where(
+            Gift.user_id == self.id,
+            Gift.launched == True,
+        )
+    ).one()
+    success_receive_counter = session.exec(
+        select(func.count()).select_from(Drift).where(
+            Drift.requester_id == self.id,  # 索取方是 requester，不是 gifter
+            Drift.status == DriftStatus.Success,
+        )
+    ).one()
+    # 还能索取的条件
+    # success_receive_counter < (success_send_counter + 1) * 2
+    return success_receive_counter < (success_send_counter + 1) * 2
 
   # 判断是否可以添加到赠送清单或心愿清单
   def can_save_to_list(self, session: Session, isbn: str) -> bool:

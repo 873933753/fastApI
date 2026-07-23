@@ -87,8 +87,18 @@ def _first_validation_message(exc: RequestValidationError) -> str:
     err = errors[0]
 
     # 字段缺失 → 统一中文
-    if err.get("type") == "missing":
-        return "参数缺失"
+    # if err.get("type") == "missing":
+    #     return "参数缺失"
+
+    err_type = err.get("type")
+    loc = err.get("loc", [])
+    field = loc[-1] if loc else "参数"
+    if err_type == "missing":
+        return f"{field} 不能为空"
+    if err_type in ("int_parsing", "int_type"):
+        return f"{field} 必须是整数"
+    if err_type == "greater_than":
+        return f"{field} 必须大于 {err.get('ctx', {}).get('gt')}"
 
     msg = err.get("msg", "参数校验失败")
     if msg.startswith("Value error, "):

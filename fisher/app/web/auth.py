@@ -16,7 +16,7 @@ from app.libs.security import create_access_token
 from app.libs.auth import get_current_user
 from app.forms.auth import EmailForm,ResetPasswordForm,VerifyCodeForm,ResetPasswordTokenForm
 from app.libs.security import create_reset_token,decode_reset_token
-from app.setting import RESET_PASSWORD_CODE_TTL
+from app.setting import RESET_PASSWORD_CODE_TTL,RESET_PASSWORD_SEND_COOLDOWN
 
 
 """ 
@@ -88,7 +88,7 @@ def login(form: LoginForm, session: Session = Depends(get_session)):
 
 # 验证JWT token的接口
 # 使用get_current_user装饰器获取当前用户，返回用户信息，给前端展示用户信息
-@web_router.get('/profile', response_model=ApiResponse[None])
+@web_router.get('/profile', response_model=ApiResponse[UserInfo])
 def profile(current_user: User = Depends(get_current_user)):
     return ApiResponse(data=UserInfo.model_validate(current_user))
 
@@ -185,8 +185,23 @@ def forgetPassword_sendCode(
 
     from app.libs.email import send_email_safe
     from app.libs.helper import generate_verify_code
-    from app.libs.redis import redis_client
-    from app.libs.redis import reset_password_code_key
+    from app.libs.redis import (
+      redis_client,
+      reset_password_code_key,
+      reset_password_send_limit_key
+    )
+
+    # 限流：60 秒内同一邮箱只能发一次
+    allowed = redis_client.set(
+        reset_password_send_limit_key(form.email),
+        "1",
+        nx=True,
+        ex=RESET_PASSWORD_SEND_COOLDOWN,
+    )
+    if not allowed: # 写入，已存在返回None，不存在返回True
+        raise AppError("发送过于频繁，请稍后再试", code=40005, http_status=429)
+
+    # 通过限流后，再生成验证码、存 Redis、发邮件
     # 邮箱存在，后台发送重置密码邮件
     code = generate_verify_code()
     # 将验证码存入redis
@@ -207,7 +222,7 @@ def forgetPassword_sendCode(
     )
     return ApiResponse(
       data={
-        "code": code
+        # "code": code
       },
       message="验证码已发送，请查收邮箱"
     )

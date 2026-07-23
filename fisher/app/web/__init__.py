@@ -25,3 +25,7 @@ web_router.include_router(wish_router)
 # 导入index路由
 from app.web import index
 
+# 导入drift路由
+from app.web.drift import drift_router
+# 将drift路由挂到web_router
+web_router.include_router(drift_router)

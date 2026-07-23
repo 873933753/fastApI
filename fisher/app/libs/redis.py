@@ -25,3 +25,7 @@ def get_redis() -> Generator[Redis, None, None]:
 # 验证码缓存key
 def reset_password_code_key(user_id: int) -> str:
     return f"reset_password_code:{user_id}"
+    
+# 同一邮箱发送验证码冷却时间key
+def reset_password_send_limit_key(email: str) -> str:
+    return f"reset_password_send_limit:{email}"

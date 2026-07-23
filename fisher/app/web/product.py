@@ -103,6 +103,8 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 # 判断用户是赠送者还是接受者
+# 若当前用户是赠送者，则返回赠送清单
+# 若当前用户是接受者，则返回接受清单
 @web_router.get('/product/trade/list', response_model=ApiResponse[TradeListData])
 def get_trade_list(
     isbn: str, 

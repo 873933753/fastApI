@@ -27,6 +27,7 @@ def init_db():
     from app.models.gift import Gift  # noqa: F401
     from app.models.user import User  # noqa: F401
     from app.models.wish import Wish  # noqa: F401
+    from app.models.drift import Drift  # noqa: F401
     
 
     SQLModel.metadata.create_all(engine)
