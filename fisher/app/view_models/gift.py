@@ -30,6 +30,8 @@ class MyGifts:
             create_time=gift.create_time,  # 来自 Gift，不是 book
             # 来自 Gift.get_wish_count(session, isbn_list)
             wish_count=self.wish_count.get(gift.isbn, 0),
+            launched=gift.launched,
+            gift_id=gift.id,
         )
 
     def to_schema(self) -> MyGiftData:

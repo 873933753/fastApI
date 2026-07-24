@@ -34,3 +34,6 @@ class ProductListData(BaseModel):
 class HomeGiftItem(ProductItem):
     create_time: FormattedDateTime
     wish_count: int = 0
+    launched: int = 0
+    gift_id: int = 0
+    wish_id: int = 0

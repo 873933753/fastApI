@@ -5,6 +5,7 @@ from app.models.base import BaseModel
 from sqlmodel import Session, select, func
 from typing import List
 from app.spider.yushu_product import YuShuProduct
+from app.libs.exceptions import AppError
 
 # TYPE_CHECKING - 类型检查，避免循环导入
 if TYPE_CHECKING:
@@ -77,3 +78,30 @@ class Wish(BaseModel, table=True):
         .where(cls.user_id == user_id)
         .order_by(cls.create_time.desc())
     )
+
+  # 根据id查询心愿清单
+  @classmethod
+  def get_wish_by_user(cls, session: Session, isbn: str, user_id: int):
+    wish = session.exec(
+      select(Wish).where(
+        Wish.isbn == isbn,
+        Wish.user_id == user_id,
+        Wish.launched == False,
+      )
+    ).first()
+
+    if not wish:
+      raise AppError('心愿清单不存在', code=40007)
+    return wish
+
+  @classmethod
+  def get_wish_by_id(cls, session: Session, wish_id: int):
+    wish = session.exec(
+      select(Wish).where(
+        Wish.id == wish_id,
+        Wish.launched == False,
+      )
+    ).first()
+    if not wish:
+      raise AppError('心愿清单不存在', code=40007)
+    return wish

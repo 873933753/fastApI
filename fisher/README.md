@@ -7,7 +7,7 @@
 
 # 2、确认redis已连接
 ## 1）启动docker中的redis-dev容器
-## 2）连接redis - docker exec -it redis-dev redis-cli
+## 2）连接redis - docker exec -it redis-dev redis-cli - 暂时不用
 
 # 3、启动项目
 ## 1）cd fisher
@@ -22,7 +22,16 @@ pip freeze | findstr python-multipart
 
 # 启动无法加载检查端口是否被占用
 ```
+reload=True 时 uvicorn 会起 两个进程：
+
+父进程：文件监听（reloader）
+子进程：真正跑 FastAPI 的 worker
+
 端口问题-停端口
 netstat -ano | findstr ":8000"
 Stop-Process -Id 2884 -Force
+
+一键停掉80端口：
+在项目目录下打开 PowerShell：
+.\stop.ps1 -- Stopped python (PID=21188)
 ```

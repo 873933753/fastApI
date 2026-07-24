@@ -53,7 +53,7 @@ class User(BaseModel, table=True):
   def can_request_gift_beans(self) -> bool:
     return True if self.beans > 1 else False
   # 每两次索要必须送出一本
-  def can_send_gift(self, session: Session) -> bool:
+  def can_request_gift_more(self, session: Session) -> bool:
     from app.models.drift import Drift
     from app.libs.enums import DriftStatus
 
@@ -144,6 +144,14 @@ class User(BaseModel, table=True):
     self.password_hash = hash_password(new_password)
     with auto_commit(session):
       session.add(self)
+
+  # 按照id查询用户
+  @classmethod
+  def get_user_by_id(cls, session: Session, user_id: int) -> Optional[User]:
+     user = session.get(cls, user_id)
+     if not user:
+       raise AppError('用户不存在', code=40005)
+     return user
 
 
 

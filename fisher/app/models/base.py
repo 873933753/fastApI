@@ -5,7 +5,13 @@ from sqlalchemy import Column, Integer
 
 class SoftDeleteMixin:
     # 软删除字段 - 是否删除，0:未删除 1:已删除
-    is_deleted = Column(Integer, nullable=False, default=0, server_default="0")
+    # is_deleted = Column(Integer, nullable=False, default=0, server_default="0")
+    # is_deleted: int = Field(
+    #     default=0,
+    #     sa_column=Column(Integer, nullable=False, server_default="0"),
+    # )
+
+    is_deleted: int = Field(default=0)
 
     # 软删除模型方法 - 将is_deleted设置为1
     def soft_delete(self):

@@ -29,7 +29,7 @@ CurrentSession = Annotated[Session, Depends(get_session)]
 
 # 添加商品到心愿清单请求体
 class SaveGiftBody(BaseModel):
-    isbn: str = Field(..., min_length=1, max_length=15)
+    isbn: str = Field(..., min_length=1, max_length=50)
 # 将商品添加到心愿清单
 @wish_router.post('/product', response_model=ApiResponse[Any])
 def save_to_gifts(
@@ -71,3 +71,17 @@ def get_wishes(
     data=PageData.build(my_trades.items, total, page, size),
     message='获取心愿清单成功'
   )
+
+  # 撤销心愿
+@wish_router.post('/request/redraw/{wish_id}', response_model=ApiResponse[dict])
+def request_redraw(
+  wish_id: int,
+  session: CurrentSession,
+  current_user: CurrentUser,
+):
+  wish = Wish.get_wish_by_id(session, wish_id)
+  if not wish or wish.launched or wish.user_id != current_user.id:
+    return ApiResponse(data={},message='无法撤销',code=400)
+  with auto_commit(session):
+    wish.soft_delete()
+  return ApiResponse(data={},message='撤销成功',code=200)

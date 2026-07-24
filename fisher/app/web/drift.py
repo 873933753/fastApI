@@ -14,6 +14,8 @@ from app.schemas.drift import DriftItem
 from app.schemas.pagination import Page, PageSize, DEFAULT_PAGE_SIZE, paginate
 from app.libs.enums import DriftStatus
 from app.database import auto_commit
+from app.models.wish import Wish
+from sqlmodel import select
 
 drift_router = APIRouter(
   prefix='/drift',
@@ -48,7 +50,7 @@ def can_request(
     return ApiResponse(data={},message='鱼豆不足',code=400)
 
   # 3、每索取两边必须送出一本
-  if not current_user.can_send_gift(session):
+  if not current_user.can_request_gift_more(session):
     return ApiResponse(data={},message='每索取两边必须送出一本',code=400)
 
   # model_dump()：将模型转换为字典
@@ -68,13 +70,16 @@ def save_drift(
   from app.view_models.product import ProductViewModel
 
   current_gift = session.get(Gift, form.gift_id)
+  if not current_gift:
+    return ApiResponse(data={}, message='礼物不存在', code=400)
+
   current_product = ProductViewModel.from_record(current_gift.book)
 
   if not current_user.can_request_gift_beans():
     return ApiResponse(data={},message='鱼豆不足',code=400)
 
   # 3、每索取两边必须送出一本
-  if not current_user.can_send_gift(session):
+  if not current_user.can_request_gift_more(session):
     return ApiResponse(data={},message='每索取两边必须送出一本',code=400)
 
   drift = Drift(
@@ -163,10 +168,62 @@ def request_reject(
   if drift.status != DriftStatus.Waiting:
     return ApiResponse(data={},message='当前状态不能拒绝',code=400)
 
+  # 返还鱼豆
+  user = User.get_user_by_id(session, drift.requester_id)
+  user.beans += 1
+
   with auto_commit(session):
-    drift.status = DriftStatus.Rejected
-    current_user.beans += 1
+    drift.status = DriftStatus.Redraw
   return ApiResponse(data={},message='拒绝成功',code=200)
 
 
 # 确认已邮寄 mailed
+@drift_router.post('/request/mailed/{drift_id}',response_model=ApiResponse[dict])
+def request_mailed(
+  drift_id:str,
+  session: CurrentSession,
+  current_user: CurrentUser
+):
+ # 先查订单状态
+ from sqlmodel import select 
+ drift = session.exec(
+   select(Drift).where(
+     Drift.id == drift_id,
+     Drift.gifter_id == current_user.id,
+     Drift.status == DriftStatus.Waiting
+   )
+ ).first()
+ if not drift:
+   return ApiResponse(data={},message='当前状态不能邮寄',code=400)
+
+ # 商品状态修改为已赠送
+ gift = Gift.get_gift_by_id(session, drift.gift_id)
+ 
+ # 更新心愿清单
+ wish = Wish.get_wish_by_user(session, gift.isbn,drift.requester_id)
+ 
+ with auto_commit(session):
+    drift.status = DriftStatus.Success
+    current_user.beans += 1
+    gift.launched = True
+    wish.launched = True
+ return ApiResponse(data={},message='确认成功',code=200)
+
+
+# 向他赠送逻辑===============================================
+@drift_router.get('/can_send', response_model=ApiResponse[dict])
+def give(
+  isbn: str,
+  wish_id: int,
+  session: CurrentSession,
+  current_user: CurrentUser,
+):
+  gift = Gift.get_gift_by_user_and_isbn(session, current_user.id, isbn)
+  # wish可能被撤销
+  wish = session.exec(select(Wish).where(Wish.isbn == isbn, Wish.launched == False,Wish.id == wish_id)).first()
+  if not wish:
+    return ApiResponse(data={},message='心愿不存在',code=400)
+  if not gift or gift.launched:
+    return ApiResponse(data={},message='无法赠送',code=400)
+  # 成功 - 给该用户发送请求页的邮件进项申请
+  return ApiResponse(data={},message='可以赠送',code=200)

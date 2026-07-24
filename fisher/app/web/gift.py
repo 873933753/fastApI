@@ -25,7 +25,7 @@ CurrentSession = Annotated[Session, Depends(get_session)]
 
 # 添加商品到赠送清单请求体
 class SaveGiftBody(BaseModel):
-    isbn: str = Field(..., min_length=1, max_length=15)
+    isbn: str = Field(..., min_length=1, max_length=50)
 # 将商品添加到赠送清单
 @gift_router.post('/product', response_model=ApiResponse[Any])
 def save_to_gifts(
@@ -112,5 +112,21 @@ def get_gifts(session: CurrentSession, current_user: CurrentUser):
   # 获取每个礼物的想要人数
   wish_counts_list = Gift.get_wish_count(session, isbn_list)
   wish_count = {item["isbn"]: item["count"] for item in wish_counts_list}
-
   return ApiResponse(data=MyGifts(gifts, wish_count).to_schema())
+
+# 撤销礼物
+@gift_router.post('/request/redraw/{gift_id}', response_model=ApiResponse[dict])
+def request_redraw(
+  gift_id: int,
+  session: CurrentSession,
+  current_user: CurrentUser,
+):
+
+  gift = Gift.get_gift_by_id(session, gift_id)
+  if not gift or gift.launched or gift.user_id != current_user.id:
+    return ApiResponse(data={},message='无法撤销',code=400)
+
+  with auto_commit(session):
+    gift.soft_delete() # 软删除礼物
+    current_user.beans -= BEAN_PER_GIFT
+  return ApiResponse(data={},message='撤销成功',code=200)

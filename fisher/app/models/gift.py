@@ -7,6 +7,7 @@ from app.spider.yushu_product import YuShuProduct
 from app.setting import RECENT_GIFT_COUNT
 from typing import List
 from app.models.wish import Wish
+from app.libs.exceptions import AppError
 
 # TYPE_CHECKING - 类型检查，避免循环导入
 if TYPE_CHECKING:
@@ -29,7 +30,7 @@ class Gift(BaseModel, table=True):
   # book_id: Optional[int] = Field(default=None, foreign_key='book.id')
 
   # 外键关联ISBN - 因为book的isbn是唯一索引，所以可以用isbn关联book
-  isbn: Optional[str] = Field(default=None, max_length=15) # ISBN，最大长度15
+  isbn: Optional[str] = Field(default=None, max_length=50) # ISBN，最大长度15
 
   # 用isbn去查书籍信息
   # 用@property装饰器，将book方法变成一个属性
@@ -114,3 +115,23 @@ class Gift(BaseModel, table=True):
     ).all()
     # [(isbn, count), ...] → [{'isbn': ..., 'count': ...}, ...]
     return [{"isbn": isbn, "count": count} for isbn, count in count_list]
+
+  # 根据id查询礼物 ，且礼物未赠送
+  @classmethod
+  def get_gift_by_id(cls, session: Session, gift_id: int):
+    gift = session.exec(
+      select(cls).where(cls.id == gift_id, cls.launched == False)
+    ).first()
+    if not gift:
+      raise AppError('礼物不存在', code=40006)
+    return gift
+
+  # 查用户是否有该isbn的礼物
+  @classmethod
+  def get_gift_by_user_and_isbn(cls, session: Session, user_id: int, isbn: str):
+    gift = session.exec(
+      select(cls).where(cls.user_id == user_id, cls.isbn == isbn, cls.launched == False)
+    ).first()
+    if not gift:
+      raise AppError('礼物不存在', code=40006)
+    return gift
