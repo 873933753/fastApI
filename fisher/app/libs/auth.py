@@ -17,10 +17,10 @@ def get_current_user(
 ) -> User:
     user_id = decode_access_token(token)
     if user_id is None:
-        raise AppError("未登录或登录已过期", code=40101, http_status=401)
+        raise AppError("未登录或登录已过期", code=401, http_status=401)
 
     user = session.get(User, user_id)
     if user is None:
-        raise AppError("用户不存在", code=40102, http_status=401)
+        raise AppError("用户不存在", code=401, http_status=401)
 
     return user

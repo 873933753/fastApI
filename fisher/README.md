@@ -35,3 +35,34 @@ Stop-Process -Id 2884 -Force
 在项目目录下打开 PowerShell：
 .\stop.ps1 -- Stopped python (PID=21188)
 ```
+
+# 统一状态码
+```
+成功：HTTP 200，body.code = 0
+业务错误：HTTP 400，body.code = 400
+未登录/登录过期：HTTP 401，body.code = 401
+参数错误：HTTP 422，body.code = 422
+服务端错误：HTTP 500，body.code = 500
+第三方服务错误：HTTP 502，body.code = 502
+
+前端处理：
+code === 0    成功
+code === 401  跳登录
+其他 code     直接 toast message
+
+业务异常：AppError抛出来
+成功返回：ApiResponse格式返回
+
+业务错误：AppError 默认改为业务错误：code=400、HTTP 400。
+成功返回：成功响应统一使用 ApiResponse 默认 code=0，
+
+全局异常处理统一：
+参数错误：422
+数据写入错误：400
+数据库/服务端错误：500
+HTTP 异常：body code 等于 HTTP status
+保留特殊状态：
+未登录/用户不存在登录态：401
+发送过于频繁：429
+
+```

@@ -91,7 +91,7 @@ class Wish(BaseModel, table=True):
     ).first()
 
     if not wish:
-      raise AppError('心愿清单不存在', code=40007)
+      raise AppError('心愿清单不存在')
     return wish
 
   @classmethod
@@ -103,5 +103,5 @@ class Wish(BaseModel, table=True):
       )
     ).first()
     if not wish:
-      raise AppError('心愿清单不存在', code=40007)
+      raise AppError('心愿清单不存在')
     return wish

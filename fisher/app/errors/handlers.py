@@ -27,7 +27,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=422,
             content={
-                "code": 42200,
+                "code": 422,
                 "message": _first_validation_message(exc),
                 "data": None,
             },
@@ -42,7 +42,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=400,  # 或 409，看你语义
             content={
-                "code": 40010,
+                "code": 400,
                 "message": "数据写入失败，请稍后重试",
                 "data": None,
             },
@@ -55,7 +55,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=500,
             content={
-                "code": 50010,
+                "code": 500,
                 "message": "服务繁忙，请稍后重试",
                 "data": None,
             },
@@ -66,7 +66,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         # 可按 status_code 细分文案 / 业务码
         message = "接口不存在" if exc.status_code == 404 else (exc.detail or "请求失败")
-        code = 40400 if exc.status_code == 404 else exc.status_code * 100
+        code = exc.status_code
         return JSONResponse(
             status_code=exc.status_code,
             content={

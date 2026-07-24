@@ -123,7 +123,7 @@ class Gift(BaseModel, table=True):
       select(cls).where(cls.id == gift_id, cls.launched == False)
     ).first()
     if not gift:
-      raise AppError('礼物不存在', code=40006)
+      raise AppError('礼物不存在')
     return gift
 
   # 查用户是否有该isbn的礼物
@@ -133,5 +133,5 @@ class Gift(BaseModel, table=True):
       select(cls).where(cls.user_id == user_id, cls.isbn == isbn, cls.launched == False)
     ).first()
     if not gift:
-      raise AppError('礼物不存在', code=40006)
+      raise AppError('礼物不存在')
     return gift

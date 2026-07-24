@@ -1,7 +1,7 @@
 class AppError(Exception):
     """应用业务异常基类，全局 handler 统一处理其子类"""
 
-    def __init__(self, message: str, code: int = 50000, http_status: int = 500):
+    def __init__(self, message: str, code: int = 400, http_status: int = 400):
         self.message = message
         self.code = code
         self.http_status = http_status
@@ -11,10 +11,5 @@ class AppError(Exception):
 class SpiderError(AppError):
     """第三方爬虫/接口请求失败时抛出"""
 
-    def __init__(self, message: str, code: int = 50001):
-        super().__init__(message, code=code, http_status=502)
-
-# class EmailAlreadyExistsError(AppError):
-#     """邮箱已存在时抛出"""
-#     def __init__(self, message: str, code: int = 40001):
-#         super().__init__(message, code=code, http_status=400)
+    def __init__(self, message: str):
+        super().__init__(message, code=502, http_status=502)

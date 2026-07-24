@@ -27,10 +27,10 @@ def get_waiting_drift_as_requester(
     ).first()
 
     if not drift:
-        raise AppError("交易不存在", code=400, http_status=400)
+        raise AppError("交易不存在")
 
     if drift.status != DriftStatus.Waiting:
-        raise AppError("当前状态不能撤销", code=400, http_status=400)
+        raise AppError("当前状态不能撤销")
 
     return drift
 
@@ -50,9 +50,9 @@ def get_waiting_drift_as_gifter(
         )
     ).first()
     if not drift:
-        raise AppError("交易不存在", code=400, http_status=400)
+        raise AppError("交易不存在")
     if drift.status != DriftStatus.Waiting:
-        raise AppError("当前状态不能拒绝", code=400, http_status=400)
+        raise AppError("当前状态不能拒绝")
     return drift
 
 
@@ -73,7 +73,7 @@ def get_mailable_drift_as_gifter(
     ).first()
 
     if not drift:
-        raise AppError("当前状态不能邮寄", code=400, http_status=400)
+        raise AppError("当前状态不能邮寄")
 
     return drift
 
@@ -95,16 +95,16 @@ def _get_requestable_gift(
     ).first()
 
     if not gift:
-        raise AppError("礼物不存在", code=400, http_status=400)
+        raise AppError("礼物不存在")
 
     if gift.is_yourself_gift(current_user.id):
-        raise AppError("不能索要自己的书", code=400, http_status=400)
+        raise AppError("不能索要自己的书")
 
     if not current_user.can_request_gift_beans():
-        raise AppError("鱼豆不足", code=400, http_status=400)
+        raise AppError("鱼豆不足")
 
     if not current_user.can_request_gift_more(session):
-        raise AppError("每索取两边必须送出一本", code=400, http_status=400)
+        raise AppError("每索取两边必须送出一本")
 
     return gift
 # can_request 用 query 版本
@@ -139,7 +139,7 @@ def can_send_dependency(
     ).first()
 
     if not gift:
-        raise AppError("无法赠送", code=400, http_status=400)
+        raise AppError("无法赠送")
 
     wish = session.exec(
         select(Wish).where(
@@ -150,6 +150,6 @@ def can_send_dependency(
     ).first()
 
     if not wish:
-        raise AppError("心愿不存在", code=400, http_status=400)
+        raise AppError("心愿不存在")
 
 

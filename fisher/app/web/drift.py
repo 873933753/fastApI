@@ -24,7 +24,7 @@ from app.deps import (
 from app.services.drift import (
   confirm_mailed,
   create_drift_request,
-  request_redraw_service,
+  redraw_drift_request,
   request_reject_service,
 )
 
@@ -57,7 +57,7 @@ def save_drift(
   current_user: CurrentUser,
 ):
   create_drift_request(session, form, current_user, current_gift)
-  return ApiResponse(data={},message='索要成功，请等待对方确认',code=200)
+  return ApiResponse(data={},message='索要成功，请等待对方确认')
 
 
 # 交易记录列表====================================
@@ -73,7 +73,6 @@ def drift_list(
   items = DriftCollectionViewModel(drifts, current_user.id).items
   return ApiResponse(
         data=PageData.build(items, total, page, size),
-        code=200,
     )
 
 # 撤销索要 - status为1可撤销
@@ -83,8 +82,8 @@ def request_redraw(
   session: CurrentSession,
   current_user: CurrentUser,      
 ):
-  request_redraw_service(session, drift, current_user)
-  return ApiResponse(data={},message='撤销成功',code=200)
+  redraw_drift_request(session, drift, current_user)
+  return ApiResponse(data={},message='撤销成功')
 
 
 # 拒绝索要 - status为1可拒绝
@@ -94,7 +93,7 @@ def request_reject(
   session: CurrentSession
 ):
   request_reject_service(session, drift)
-  return ApiResponse(data={},message='拒绝成功',code=200)
+  return ApiResponse(data={},message='拒绝成功')
 
 
 # 确认已邮寄 mailed
@@ -105,7 +104,7 @@ def request_mailed(
   current_user: CurrentUser
 ):
   confirm_mailed(session, drift, current_user)
-  return ApiResponse(data={},message='确认成功',code=200)
+  return ApiResponse(data={},message='确认成功')
 
 
 # 向他赠送逻辑===============================================
@@ -115,4 +114,4 @@ def give(
 ):
   
   # 成功 - 给该用户发送请求页的邮件进项申请
-  return ApiResponse(data={},message='可以赠送',code=200)
+  return ApiResponse(data={},message='可以赠送')

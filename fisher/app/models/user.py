@@ -81,7 +81,7 @@ class User(BaseModel, table=True):
     record = yushu_product.first # 获取第一条数据
     if not record:
       # return ApiResponse(data={},message='商品不存在',code=400)
-      raise AppError(message='商品不存在', code=40001, http_status=400)
+      raise AppError(message='商品不存在')
 
     # 2）判断赠送清单中是否存在该商品,用 user_id + isbn 查 Gift 表
     gift = session.exec(
@@ -130,10 +130,10 @@ class User(BaseModel, table=True):
       from app.libs.security import decode_reset_token
       user_id = decode_reset_token(token)
       if not user_id:
-          raise AppError("token无效", code=40004)
+          raise AppError("token无效")
       user = session.get(cls, user_id)
       if not user:
-          raise AppError("用户不存在", code=40005)
+          raise AppError("用户不存在")
       return user
 
   # 重置密码
@@ -150,7 +150,7 @@ class User(BaseModel, table=True):
   def get_user_by_id(cls, session: Session, user_id: int) -> Optional[User]:
      user = session.get(cls, user_id)
      if not user:
-       raise AppError('用户不存在', code=40005)
+       raise AppError('用户不存在')
      return user
 
 

@@ -55,7 +55,7 @@ def create_drift_request(
 
 
 # 撤销索要的业务逻辑
-def request_redraw_service(
+def redraw_drift_request(
     session: Session,
     drift: Drift,
     current_user: User,

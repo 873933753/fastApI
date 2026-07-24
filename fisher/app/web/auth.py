@@ -38,7 +38,7 @@ def register(form: RegisterForm, session: Session = Depends(get_session)):
     select(User).where(User.email == form.email)
   ).first()
   if existing:
-    raise AppError("电子邮箱已被注册", code=40001)
+    raise AppError("电子邮箱已被注册")
 
   # 进入到这里,说明表单验证通过
   # 这里可以进行数据库操作
@@ -74,7 +74,7 @@ def login(form: LoginForm, session: Session = Depends(get_session)):
     # 2)校验查出来的用户密码是否匹配
     # “用户不存在”和“密码错误”应返回同一条消息（如 "邮箱或密码错误"），降低邮箱枚举风险
     if not user or not verify_password(form.password,user.password_hash):
-      raise AppError("邮箱或密码错误",code=40002,http_status=400)
+      raise AppError("邮箱或密码错误")
       
     # 邮箱密码匹配 - 登录成功并返回用户信息
     user_info = UserInfo.model_validate(user)
@@ -102,7 +102,7 @@ def forgetPassword(
 ):
     user = User.get_user_by_email(session, form.email)
     if not user:
-      raise AppError("邮箱不存在", code=40003, http_status=400)
+      raise AppError("邮箱不存在")
     
     from app.libs.email import send_email_safe
     # 邮箱存在，后台发送重置密码邮件
@@ -181,7 +181,7 @@ def forgetPassword_sendCode(
 ):
     user = User.get_user_by_email(session, form.email)
     if not user:
-      raise AppError("邮箱不存在", code=40003, http_status=400)
+      raise AppError("邮箱不存在")
 
     from app.libs.email import send_email_safe
     from app.libs.helper import generate_verify_code
@@ -199,7 +199,7 @@ def forgetPassword_sendCode(
         ex=RESET_PASSWORD_SEND_COOLDOWN,
     )
     if not allowed: # 写入，已存在返回None，不存在返回True
-        raise AppError("发送过于频繁，请稍后再试", code=40005, http_status=429)
+        raise AppError("发送过于频繁，请稍后再试", code=429, http_status=429)
 
     # 通过限流后，再生成验证码、存 Redis、发邮件
     # 邮箱存在，后台发送重置密码邮件
@@ -235,7 +235,7 @@ def forgetPassword_verifyCode(
 ):
     user = User.get_user_by_email(session, form.email)
     if not user:
-      raise AppError("邮箱不存在", code=40003, http_status=400)
+      raise AppError("邮箱不存在")
     
     from app.libs.redis import redis_client
     from app.libs.redis import reset_password_code_key
@@ -244,7 +244,7 @@ def forgetPassword_verifyCode(
     stored_code = redis_client.get(reset_password_code_key(user.id))
 
     if not stored_code or stored_code != form.code:
-      raise AppError("验证码错误", code=40004, http_status=400)
+      raise AppError("验证码错误")
 
     # 删除验证码
     redis_client.delete(reset_password_code_key(user.id))
@@ -278,7 +278,7 @@ def forgetPassword_resetPassword(
 
     result  = decode_reset_token(form.reset_token)
     if not result :
-      raise AppError("凭证无效或已过期", code=40004, http_status=400)
+      raise AppError("凭证无效或已过期")
 
     user_id, jti = result
     # 删除redis中的user_id的key
@@ -287,7 +287,7 @@ def forgetPassword_resetPassword(
     # GET + DEL 原子操作，防止并发重复提交
     stored_user_id = redis_client.getdel(key)
     if not stored_user_id or int(stored_user_id) != user_id:
-        raise AppError("凭证无效或已过期", code=40004)
+        raise AppError("凭证无效或已过期")
 
     # 重置密码
     user = session.get(User, user_id)
