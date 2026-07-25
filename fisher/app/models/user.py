@@ -1,4 +1,3 @@
-import stat
 from sqlmodel import Field
 from typing import Optional
 from app.models.base import BaseModel

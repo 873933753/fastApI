@@ -87,6 +87,13 @@ alembic downgrade -1
 
 环境变量见 `.env.example`。本地用 `APP_ENV=dev`；生产用 `APP_ENV=prod`（表结构走 Alembic，启动时不 create_all）。
 
+# Python 版本
+
+本地与生产统一使用 **Python 3.14**（见 `.python-version`）。  
+创建 venv 时请使用 `python3.14 -m venv venv`，勿用系统自带的 3.10。
+
+后续计划：用 Docker 固定同一运行时（上线完成后再配置）。
+
 # 环境配置（dev / staging / prod）
 
 文件约定：
