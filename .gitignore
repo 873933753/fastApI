@@ -3,4 +3,8 @@ __pycache__/
 *.pyo
 venv/
 .env
+.env.dev
+.env.staging
+.env.prod
+.env.local
 docs/

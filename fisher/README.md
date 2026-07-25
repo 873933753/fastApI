@@ -83,3 +83,30 @@ HTTP 异常：body code 等于 HTTP status
 alembic current
 alembic upgrade head
 alembic downgrade -1
+```
+
+环境变量见 `.env.example`。本地用 `APP_ENV=dev`；生产用 `APP_ENV=prod`（表结构走 Alembic，启动时不 create_all）。
+
+# 环境配置（dev / staging / prod）
+
+文件约定：
+
+| 文件 | 作用 | 是否进 Git |
+|------|------|------------|
+| `.env` | 只写 `APP_ENV=dev`（或 staging/prod） | 否 |
+| `.env.dev` | 本地完整配置 | 否 |
+| `.env.staging` / `.env.prod` | 预发/生产完整配置（可选；生产更推荐平台注入） | 否 |
+| `.env.example` | 模板说明 | 是 |
+
+加载顺序（`app/secure.py`）：先 `.env`，再 `.env.{APP_ENV}`。进程里已有的环境变量优先（方便测试 / Docker）。
+
+本地切换：
+
+1. 准备好对应的 `.env.dev`（或 `.env.staging`）
+2. 修改 `.env` 中的 `APP_ENV=...`
+3. **重启** `index.py` / uvicorn
+
+```powershell
+# 自检当前环境
+.\venv\Scripts\python.exe -c "from app.secure import APP_ENV, SQL_ECHO, DATABASE_URL; print(APP_ENV, SQL_ECHO, DATABASE_URL[:40])"
+```

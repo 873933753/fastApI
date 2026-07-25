@@ -1,14 +1,12 @@
 from app.libs.http_client import HTTP
 
 import os
-from dotenv import load_dotenv
 from app.setting import DEFAULT_PAGE_SIZE
 
+# 通过 secure 加载 .env + .env.{APP_ENV}
+import app.secure  # noqa: F401
 
-# 加载环境变量
-load_dotenv()
-# 获取环境变量
-APP_KEY = os.getenv('AppKey')
+APP_KEY = os.getenv("AppKey")
 
 # 这里是根据关键字和ISBN搜索图书的类
 class YuShuBook:

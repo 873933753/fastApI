@@ -10,13 +10,9 @@ from fastapi.staticfiles import StaticFiles
 # 在应用启动和关闭时初始化和关闭数据库
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    from app.database import init_db
     from app.libs.redis import get_redis_client
-    from app.secure import IS_PROD
 
-    if not IS_PROD:
-        init_db()  # 仅开发/预发临时兜底；生产用 Alembic
-
+    # 表结构由 Alembic 管理，启动时不再 create_all
     get_redis_client().ping()  # 启动时确认 Redis 可用
     yield
     get_redis_client().close()  # 关闭连接池
