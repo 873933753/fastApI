@@ -8,7 +8,8 @@ from app.libs.security import decode_access_token
 from app.models.user import User
 
 # tokenUrl 用于 Swagger 文档，填你的登录路径
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/web/login",auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/web/login", auto_error=False)
+
 
 # 获取当前用户 ，如果未登录或登录已过期，返回401状态码
 def get_current_user(
