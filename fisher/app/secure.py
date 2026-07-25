@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 # 加载 .env 中的环境变量（AppKey、DATABASE_URL 等）
 load_dotenv()
 
+# 运行环境：dev / staging / prod
+APP_ENV = os.getenv("APP_ENV", "dev").lower()
+IS_PROD = APP_ENV == "prod"
+
 # 数据库连接串，从 .env 读取
 DATABASE_URL = os.getenv("DATABASE_URL")
 # SQLAlchemy echo：控制台打印 SQL，开发可设 true，生产保持 false

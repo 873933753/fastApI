@@ -66,3 +66,20 @@ HTTP 异常：body code 等于 HTTP status
 发送过于频繁：429
 
 ```
+
+# 数据库迁移（Alembic）
+
+改表不要靠启动时 create_all，按下面流程：
+
+1. 修改 `app/models/*.py`
+2. 生成迁移：`alembic revision --autogenerate -m "说明这次改了什么"`
+3. **打开** `alembic/versions/` 下新文件检查：只保留本次真正需要的变更，删掉误报的 drop/alter
+4. 执行：`alembic upgrade head`
+5. 提交时：模型文件 + `alembic/versions/xxx.py` 一起提交
+
+常用命令（在 `fisher/` 目录、已激活 venv）：
+
+```powershell
+alembic current
+alembic upgrade head
+alembic downgrade -1
