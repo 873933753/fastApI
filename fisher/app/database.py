@@ -1,6 +1,6 @@
 # 数据库连接与会话管理
 from sqlmodel import SQLModel, create_engine, Session
-from app.secure import DATABASE_URL
+from app.secure import DATABASE_URL, SQL_ECHO
 from sqlalchemy import event
 from sqlalchemy.orm import with_loader_criteria
 from app.models.base import BaseModel
@@ -15,9 +15,8 @@ connect_args = (
     else {}
 )
 
-# 创建数据库引擎
-# echo=True 会在控制台打印 SQL，方便开发调试；上线后可改为 False
-engine = create_engine(DATABASE_URL, echo=True, connect_args=connect_args)
+# 创建数据库引擎；echo 由 .env 中 SQL_ECHO 控制（true/1/yes 开启 SQL 日志）
+engine = create_engine(DATABASE_URL, echo=SQL_ECHO, connect_args=connect_args)
 
 
 def init_db():
