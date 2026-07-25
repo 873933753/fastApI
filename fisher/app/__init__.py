@@ -37,6 +37,8 @@ def register_apirouter(app):
   from app.web import web_router
   app.include_router(web_router)
 
-  # 注册test路由
-  from test import test_router
-  app.include_router(test_router)
+  # 练习/调试路由仅非生产环境挂载
+  from app.secure import IS_PROD
+  if not IS_PROD:
+    from test import test_router
+    app.include_router(test_router)
