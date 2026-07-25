@@ -3,10 +3,12 @@ import asyncio
 # 测试 gather 返回结果的顺序
 # 返回列表顺序 = 传入顺序（不是完成顺序）！！！
 
+
 async def fetch(name, delay):
     await asyncio.sleep(delay)
     print(f"{name} 完成")
     return f"{name} 的数据"
+
 
 async def main():
     # gather 返回结果列表，顺序与传入顺序一致
@@ -18,6 +20,7 @@ async def main():
     # 返回列表顺序 = 传入顺序（不是完成顺序）！！！
     print("结果:", results)
     print("类型:", type(results))
+
 
 asyncio.run(main())
 

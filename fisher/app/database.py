@@ -27,9 +27,9 @@ def init_db():
     from app.models.user import User  # noqa: F401
     from app.models.wish import Wish  # noqa: F401
     from app.models.drift import Drift  # noqa: F401
-    
 
     SQLModel.metadata.create_all(engine)
+
 
 # 获取数据库会话，供路由通过 Depends(get_session) 注入使用
 def get_session():
@@ -54,6 +54,7 @@ def get_session():
     with Session(engine) as session:
         yield session
 
+
 # 上下文管理器：块成功则 commit，失败则 rollback 再抛出。
 @contextmanager
 def auto_commit(session: Session):
@@ -64,7 +65,8 @@ def auto_commit(session: Session):
     except Exception as e:
         session.rollback()
         raise e
- 
+
+
 # 监听SQL执行，过滤软删除数据
 # 只查询未删除的数据
 @event.listens_for(Session, "do_orm_execute")

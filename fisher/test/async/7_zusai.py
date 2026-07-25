@@ -8,15 +8,18 @@
 import asyncio
 import time
 
+
 async def bad_task(name):
     print(f"  {name} 开始")
     time.sleep(1)  # ❌ 同步阻塞！卡住整个事件循环
     print(f"  {name} 结束")
 
+
 async def good_task(name):
     print(f"  {name} 开始")
     await asyncio.sleep(1)  # ✅ 异步等待，不阻塞
     print(f"  {name} 结束")
+
 
 async def main():
     print("=== 用 time.sleep（错误示范）===")
@@ -28,6 +31,7 @@ async def main():
     start = time.time()
     await asyncio.gather(good_task("C"), good_task("D"))
     print(f"耗时: {time.time() - start:.2f} 秒")
+
 
 asyncio.run(main())
 

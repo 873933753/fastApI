@@ -5,16 +5,18 @@ import time
 # create_task 是立刻提交给事件循环，gather 是一次性提交并等待全部
 # 任务在 create_task() 时就已开始执行，你可以选择何时 await 获取结果
 
+
 async def work(name, sec):
     print(f"  {name} 启动")
     await asyncio.sleep(sec)
     print(f"  {name} 完成")
     return name
 
+
 async def main():
     start = time.time()
 
-  # 方式A：create_task — 立刻提交给事件循环
+    # 方式A：create_task — 立刻提交给事件循环
     print("--- create_task ---")
     t1 = asyncio.create_task(work("任务1", 2))
     t2 = asyncio.create_task(work("任务2", 1))
@@ -38,5 +40,6 @@ async def main():
     )
     print(f"  结果: {results}")
     print(f"  耗时: {time.time() - start:.2f} 秒")
+
 
 asyncio.run(main())

@@ -3,10 +3,12 @@ import time
 
 # 验证顺序和并发的耗时
 
+
 async def sleep_task(name, sec):
     print(f"  {name} 开始")
     await asyncio.sleep(sec)
     print(f"  {name} 结束")
+
 
 async def main():
     # --- 测试1：顺序 ---
@@ -24,6 +26,7 @@ async def main():
         sleep_task("并发-C", 1),
     )
     print(f"并发耗时: {time.time() - start:.2f} 秒")
+
 
 asyncio.run(main())
 
