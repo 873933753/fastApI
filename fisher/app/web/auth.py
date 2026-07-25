@@ -1,5 +1,4 @@
 # 登录注册模块
-from contextlib import redirect_stderr
 from . import web_router
 from app.forms.auth import RegisterForm, LoginForm
 from app.schemas.response import ApiResponse
@@ -150,7 +149,6 @@ def reset_password(
     # 导入ValidationError-用于处理表单验证错误
     from pydantic import ValidationError
     from fastapi.exceptions import RequestValidationError
-    from app.libs.security import decode_reset_token
 
     try:
         # 这里才会走 ResetPasswordForm 的长度/两次一致等规则

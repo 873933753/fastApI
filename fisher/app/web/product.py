@@ -5,7 +5,7 @@ from pydantic import StringConstraints
 from sqlmodel import Session
 
 from app.libs.helper import is_isbn_or_key
-from app.schemas.product import ProductSearchData, ProductItem, ProductListData
+from app.schemas.product import ProductSearchData, ProductListData
 from app.schemas.trade import TradeListData
 from app.schemas.response import ApiResponse
 from app.setting import DEFAULT_PAGE_SIZE, PAGE_SIZE_MAX, PAGE_SIZE_MIN

@@ -4,7 +4,6 @@ from pydantic import (
     BaseModel,
     field_validator,
     AfterValidator,
-    StringConstraints,
     ValidationInfo,
 )
 

@@ -3,7 +3,7 @@ from sqlmodel import Field
 from app.models.base import BaseModel
 from app.libs.enums import DriftStatus
 from sqlalchemy import Column, Integer
-from sqlmodel import select, Session
+from sqlmodel import select
 
 
 class Drift(BaseModel, table=True):

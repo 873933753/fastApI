@@ -1,4 +1,3 @@
-import token
 import bcrypt
 import jwt
 from datetime import datetime, timezone, timedelta

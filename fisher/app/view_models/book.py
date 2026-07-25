@@ -1,4 +1,3 @@
-from sqlalchemy.sql.coercions import cls
 
 
 # 单本书籍信息包装模型
