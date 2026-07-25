@@ -3,26 +3,28 @@ from sqlalchemy.sql.coercions import cls
 
 # 单本书籍信息包装模型
 class BookViewModel:
-  def __init__(self,book_data):
-    self.title = book_data['title']
-    self.author = book_data['author']
-    self.publisher = book_data['publisher'] or ''
-    self.price = book_data['price']
-    self.summary = book_data['summary']
-    self.image = book_data['pictures']
-    self.pages = book_data['pages']
+    def __init__(self, book_data):
+        self.title = book_data["title"]
+        self.author = book_data["author"]
+        self.publisher = book_data["publisher"] or ""
+        self.price = book_data["price"]
+        self.summary = book_data["summary"]
+        self.image = book_data["pictures"]
+        self.pages = book_data["pages"]
+
 
 # 多本书籍信息包装模型
 class BookCollectionViewModel:
-  def __init__(self):
-    self.total = 0
-    self.books = []
-    self.keyword = ''
-  
-  def fill(self,yushu_book,keyword):
-    self.total = yushu_book.total
-    self.books = [BookViewModel(book) for book in yushu_book.books]
-    self.keyword = keyword
+    def __init__(self):
+        self.total = 0
+        self.books = []
+        self.keyword = ""
+
+    def fill(self, yushu_book, keyword):
+        self.total = yushu_book.total
+        self.books = [BookViewModel(book) for book in yushu_book.books]
+        self.keyword = keyword
+
 
 # # 书籍数据包装模型
 # class BookViewModel:

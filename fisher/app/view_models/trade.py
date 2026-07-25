@@ -23,7 +23,7 @@ class TradeInfo:
         #     email=single.user.email,
         # )
         # 大部分一致，少数要改名/拼装 → 混合
-        data = single.model_dump() # 将对象转换为字典
+        data = single.model_dump()  # 将对象转换为字典
         data["time"] = data.pop("create_time")
         data["email"] = single.user.email if single.user else None
         return TradeItem.model_validate(data)
