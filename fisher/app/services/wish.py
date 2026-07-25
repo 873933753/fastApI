@@ -14,15 +14,14 @@ def redraw_wish(
     with auto_commit(session):
         wish.soft_delete()
 
+
 def add_wish_to_list_service(
     session: Session,
     current_user: User,
     isbn: str,
 ) -> Wish:
     if not current_user.can_save_to_list(session, isbn):
-        raise AppError(
-            message='这个商品已在赠送清单或心愿清单中，请不要重复添加'
-        )
+        raise AppError(message="这个商品已在赠送清单或心愿清单中，请不要重复添加")
 
     wish = Wish(
         user_id=current_user.id,

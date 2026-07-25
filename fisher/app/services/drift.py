@@ -8,19 +8,16 @@ from app.models.user import User
 from app.forms.drift import DriftForm
 from app.view_models.product import ProductViewModel
 
+
 # 确认已邮寄的业务逻辑
-def confirm_mailed(
-  session: Session,
-  drift: Drift, 
-  current_user: User
-) -> None:
+def confirm_mailed(session: Session, drift: Drift, current_user: User) -> None:
     gift = Gift.get_gift_by_id(session, drift.gift_id)
     wish = Wish.get_wish_by_user(session, gift.isbn, drift.requester_id)
     with auto_commit(session):
         drift.status = DriftStatus.Success
-        current_user.beans += 1 # 邮寄成功 +1
-        gift.launched = True # 当前用户 - 商品状态修改为已赠送
-        wish.launched = True # 索要用户 - 心愿清单状态修改为已完成
+        current_user.beans += 1  # 邮寄成功 +1
+        gift.launched = True  # 当前用户 - 商品状态修改为已赠送
+        wish.launched = True  # 索要用户 - 心愿清单状态修改为已完成
 
 
 # 提交索要的业务逻辑
@@ -63,6 +60,7 @@ def redraw_drift_request(
     with auto_commit(session):
         drift.status = DriftStatus.Redraw
         current_user.beans += 1
+
 
 # 拒绝索要的业务逻辑
 def request_reject_service(

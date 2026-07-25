@@ -3,6 +3,7 @@ from sqlmodel import Session, select
 from app.models.gift import Gift
 from app.models.wish import Wish
 
+
 # 获取交易列表,业务逻辑
 def get_trade_list(session: Session, user_id: int, isbn: str):
     user_type = 0

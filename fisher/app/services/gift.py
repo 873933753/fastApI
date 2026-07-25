@@ -16,6 +16,7 @@ def redraw_gift(
         gift.soft_delete()
         current_user.beans -= BEAN_PER_GIFT
 
+
 # 添加商品到赠送清单
 def add_gift_to_list_service(
     session: Session,
@@ -23,9 +24,7 @@ def add_gift_to_list_service(
     isbn: str,
 ) -> Gift:
     if not current_user.can_save_to_list(session, isbn):
-        raise AppError(
-            message='这个商品已在赠送清单或心愿清单中，请不要重复添加'
-        )
+        raise AppError(message="这个商品已在赠送清单或心愿清单中，请不要重复添加")
 
     gift = Gift(
         user_id=current_user.id,
