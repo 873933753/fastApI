@@ -1,6 +1,6 @@
-import re # 正则表达式
+import re  # 正则表达式
 from typing import Annotated
-from pydantic import BaseModel, field_validator, AfterValidator,StringConstraints
+from pydantic import BaseModel, field_validator, AfterValidator, StringConstraints
 
 
 # 邮箱验证规则
@@ -9,13 +9,18 @@ def _strip_required_email(v: str) -> str:
     if not v:
         raise ValueError("请输入正确的邮箱")
     return v
+
+
 def _validate_register_email(v: str) -> str:
-    v = _strip_required_email(v)  # 先复用基础规则；若文案要「电子邮箱不可以为空」可单独写
+    v = _strip_required_email(
+        v
+    )  # 先复用基础规则；若文案要「电子邮箱不可以为空」可单独写
     if len(v) < 8 or len(v) > 64:
         raise ValueError("电子邮箱长度需在8到64个字符之间")
     if not re.fullmatch(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", v):
         raise ValueError("电子邮箱不符合规范")
     return v
+
 
 # 昵称类型 - 使用注解
 Nickname = Annotated[
@@ -32,6 +37,7 @@ Email = Annotated[str, AfterValidator(_strip_required_email)]
 
 # 注册：完整校验
 RegisterEmail = Annotated[str, AfterValidator(_validate_register_email)]
+
 
 class RegisterForm(BaseModel):
     email: Email
@@ -74,6 +80,7 @@ class RegisterForm(BaseModel):
     #         raise ValueError("昵称至少需要两个字符，最多10个字符")
     #     return v
 
+
 class LoginForm(BaseModel):
     email: Email
     password: str
@@ -93,7 +100,8 @@ class LoginForm(BaseModel):
         v = (v or "").strip()
         if not v:
             raise ValueError("密码不可以为空，请输入你的密码")
-        return v   
+        return v
+
 
 class EmailForm(BaseModel):
     email: Email
