@@ -1,4 +1,4 @@
-# 默认每页显示10条数据  
+# 默认每页显示10条数据
 DEFAULT_PAGE_SIZE = 10
 # 每页显示数据的最小值
 PAGE_SIZE_MIN = 1
