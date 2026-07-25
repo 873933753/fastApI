@@ -11,6 +11,7 @@ from app.models.gift import Gift
 from app.forms.drift import DriftForm
 from app.models.wish import Wish
 
+
 # 可以撤销的索要的依赖判断
 # 1）所属当前用户、2）当前状态为等待中
 # 3）所属drift_id
@@ -60,7 +61,7 @@ def get_waiting_drift_as_gifter(
 # 1）所属当前用户、2）当前状态为等待中
 # 3）所属drift_id
 def get_mailable_drift_as_gifter(
-    drift_id: Annotated[int, Path(ge=1)], # Path - 路径参数,ge - 大于等于1
+    drift_id: Annotated[int, Path(ge=1)],  # Path - 路径参数,ge - 大于等于1
     session: CurrentSession,
     current_user: CurrentUser,
 ) -> Drift:
@@ -68,7 +69,7 @@ def get_mailable_drift_as_gifter(
         select(Drift).where(
             Drift.id == drift_id,
             Drift.gifter_id == current_user.id,
-            Drift.status == DriftStatus.Waiting
+            Drift.status == DriftStatus.Waiting,
         )
     ).first()
 
@@ -76,6 +77,7 @@ def get_mailable_drift_as_gifter(
         raise AppError("当前状态不能邮寄")
 
     return drift
+
 
 # 确保可以索要的依赖判断
 # 1、自己的书不能索要
@@ -90,7 +92,7 @@ def _get_requestable_gift(
     gift = session.exec(
         select(Gift).where(
             Gift.id == gift_id,
-            Gift.launched == False, # 过滤已赠送的礼物
+            Gift.launched == False,  # 过滤已赠送的礼物
         )
     ).first()
 
@@ -107,6 +109,8 @@ def _get_requestable_gift(
         raise AppError("每索取两边必须送出一本")
 
     return gift
+
+
 # can_request 用 query 版本
 def get_requestable_gift_from_query(
     gift_id: Annotated[int, Query(ge=1)],
@@ -114,6 +118,8 @@ def get_requestable_gift_from_query(
     current_user: CurrentUser,
 ) -> Gift:
     return _get_requestable_gift(session, current_user, gift_id)
+
+
 # save_drift 用 form 版本
 def get_requestable_gift_from_drift_form(
     form: DriftForm,
@@ -151,5 +157,3 @@ def can_send_dependency(
 
     if not wish:
         raise AppError("心愿不存在")
-
-
