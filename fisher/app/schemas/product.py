@@ -7,11 +7,11 @@ from app.libs.helper import FormattedDateTime
 class ProductItem(BaseModel):
     id: str
     productName: str
-    productSubtitle: str = ''
-    salePrice: Union[str, float, int] = ''
+    productSubtitle: str = ""
+    salePrice: Union[str, float, int] = ""
     orgPrice: float = 0
     stock: int = 0
-    image: str = ''
+    image: str = ""
     isbn: str
 
 
@@ -21,8 +21,9 @@ class ProductSearchData(BaseModel):
     size: int
     total: int
     pages: int = 0
-    type: str = Field(description='single 或 list')
+    type: str = Field(description="single 或 list")
     items: List[ProductItem]
+
 
 class ProductListData(BaseModel):
     page: int
@@ -30,6 +31,7 @@ class ProductListData(BaseModel):
     total: int
     pages: int = 0
     items: List[ProductItem]
+
 
 class HomeGiftItem(ProductItem):
     create_time: FormattedDateTime

@@ -2,7 +2,8 @@ from typing import Generic, Optional, TypeVar
 
 from pydantic import BaseModel
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 # 通用响应模型
 # code: 响应码，0表示成功，其他表示错误
@@ -12,5 +13,5 @@ T = TypeVar('T')
 # 只能放Pydantic模型，因为Pydantic模型可以被序列化
 class ApiResponse(BaseModel, Generic[T]):
     code: int = 0
-    message: str = 'ok'
+    message: str = "ok"
     data: Optional[T] = None

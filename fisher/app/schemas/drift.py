@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.libs.enums import DriftStatus
 from app.libs.helper import FormattedDateTime
 
+
 class DriftItem(BaseModel):
     id: int
     recipient_name: str
@@ -24,10 +25,12 @@ class DriftItem(BaseModel):
     address: str
     mobile: str
 
+
 # drift -detail
 class DriftDetail(DriftItem):
     mobile: str
     address: str
+
 
 class DriftListData(BaseModel):
     items: List[DriftItem]

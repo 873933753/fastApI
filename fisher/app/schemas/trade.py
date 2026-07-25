@@ -14,6 +14,7 @@ class TradeItem(BaseModel):
 #     total: int
 #     trades: list[TradeItem]
 
+
 class TradeListData(BaseModel):
     total: int
     trades: list[TradeItem]
