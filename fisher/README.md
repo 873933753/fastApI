@@ -11,7 +11,7 @@
 
 # 3、启动项目
 ## 1）cd fisher
-## 2）激活虚拟环境 
+## 2）激活虚拟环境 .\venv\Scripts\Activate.ps1
 ## 3）启动命令  .\venv\Scripts\python.exe index.py
 
 
