@@ -3,7 +3,8 @@ from sqlmodel import Field
 from app.models.base import BaseModel
 from app.libs.enums import DriftStatus
 from sqlalchemy import Column, Integer
-from sqlmodel import select,Session
+from sqlmodel import select, Session
+
 
 class Drift(BaseModel, table=True):
     """一次具体的交易信息"""
@@ -46,4 +47,3 @@ class Drift(BaseModel, table=True):
             .where((cls.requester_id == user_id) | (cls.gifter_id == user_id))
             .order_by(cls.create_time.desc())
         )
-                
