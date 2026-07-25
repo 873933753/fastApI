@@ -8,3 +8,4 @@ venv/
 .env.prod
 .env.local
 docs/
+tests/
