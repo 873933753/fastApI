@@ -2,7 +2,7 @@ from app.libs.http_client import HTTP, HttpResult
 from app.libs.exceptions import SpiderError
 
 from app.setting import DEFAULT_PAGE_SIZE
-from app.secure import ISBN_KEY
+from app.secure import ISBN_KEY, YU_SHU_API_BASE
 
 # 通过 secure 加载 .env + .env.{APP_ENV}
 import app.secure  # noqa: F401
@@ -13,14 +13,19 @@ APP_KEY = ISBN_KEY
 def _to_int(value, default=0):
     try:
         return int(value)
-    except TypeError, ValueError:
+    except (TypeError, ValueError):
         return default
 
 
 class YuShuProduct:
-    # isbn_url = 'https://front.zstcwx.cn/api/sysAboutUs/findInfo?isbn={isbn}&appKey={appKey}'
-    isbn_url = "https://front.zstcwx.cn/api/product/queryByDictPage?current={page}&size={size}&bookName={keyword}&appKey={appKey}"
-    keyword_url = "https://front.zstcwx.cn/api/product/queryByDictPage?current={page}&size={size}&bookName={keyword}&appKey={appKey}"
+    isbn_url = (
+        f"{YU_SHU_API_BASE}/product/queryByDictPage"
+        "?current={page}&size={size}&bookName={keyword}&appKey={appKey}"
+    )
+    keyword_url = (
+        f"{YU_SHU_API_BASE}/product/queryByDictPage"
+        "?current={page}&size={size}&bookName={keyword}&appKey={appKey}"
+    )
 
     def __init__(self):
         self.total = 0

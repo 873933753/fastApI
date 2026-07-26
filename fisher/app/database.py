@@ -1,5 +1,5 @@
 # 数据库连接与会话管理
-from sqlmodel import SQLModel, create_engine, Session
+from sqlmodel import create_engine, Session
 from app.secure import DATABASE_URL, SQL_ECHO
 from sqlalchemy import event
 from sqlalchemy.orm import with_loader_criteria

@@ -1,8 +1,7 @@
 from app.libs.http_client import HTTP
 
-import os
 from app.setting import DEFAULT_PAGE_SIZE
-from app.secure import ISBN_KEY
+from app.secure import ISBN_KEY, YU_SHU_API_BASE
 
 # 通过 secure 加载 .env + .env.{APP_ENV}
 import app.secure  # noqa: F401
@@ -12,13 +11,13 @@ APP_KEY = ISBN_KEY
 
 # 这里是根据关键字和ISBN搜索图书的类
 class YuShuBook:
-    # isbn_url = 'https://data.isbn.work/openApi/getInfoByIsbn?isbn={isbn}&appKey={appKey}'
-    # keyword_url = 'https://data.isbn.work/openApi/book/page?current={page}&size=10&bookName={keyword}&appKey={appKey}'
-
     isbn_url = (
-        "https://front.zstcwx.cn/api/sysAboutUs/findInfo?isbn={isbn}&appKey={appKey}"
+        f"{YU_SHU_API_BASE}/sysAboutUs/findInfo?isbn={{isbn}}&appKey={{appKey}}"
     )
-    keyword_url = "https://front.zstcwx.cn/api/sysAboutUs/findInfo?current={page}&size={size}&bookName={keyword}&appKey={appKey}"
+    keyword_url = (
+        f"{YU_SHU_API_BASE}/sysAboutUs/findInfo"
+        "?current={page}&size={size}&bookName={keyword}&appKey={appKey}"
+    )
 
     # 初始化书籍信息
     def __init__(self):

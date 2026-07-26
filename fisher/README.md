@@ -117,3 +117,16 @@ alembic downgrade -1
 # 自检当前环境
 .\venv\Scripts\python.exe -c "from app.secure import APP_ENV, SQL_ECHO, DATABASE_URL; print(APP_ENV, SQL_ECHO, DATABASE_URL[:40])"
 ```
+
+# 首次本地配置（最短路径）
+1. Python **3.14** 创建并激活 venv（见下方「Python 版本」）
+2. `pip install -r requirements.txt`
+3. 复制环境模板：
+   - 复制 `.env.example` → `.env.dev`，填入真实 `DATABASE_URL` / JWT / Redis / 邮箱 / `AppKey` / `YU_SHU_API_BASE`
+   - 新建 `.env`，内容仅一行：`APP_ENV=dev`
+4. 确认 MySQL 已建库、Redis 已启动
+5. 表结构（空库或可重建的开发库）：
+   ```powershell
+   alembic upgrade head
+6. 自检配置：`.\venv\Scripts\python.exe -c "from app.secure import APP_ENV, DATABASE_URL; print(APP_ENV, DATABASE_URL[:40])"`
+7. 启动：`.\venv\Scripts\python.exe index.py`

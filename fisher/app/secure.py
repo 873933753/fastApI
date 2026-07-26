@@ -75,3 +75,5 @@ REDIS_URL = _require_str("REDIS_URL")
 
 # 图书搜索API配置
 ISBN_KEY = _require_str("AppKey")
+# 第三方图书/商品接口根地址，末尾不要带 /
+YU_SHU_API_BASE = _require_str("YU_SHU_API_BASE").rstrip("/")
