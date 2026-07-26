@@ -19,16 +19,17 @@ connect_args = (
 engine = create_engine(DATABASE_URL, echo=SQL_ECHO, connect_args=connect_args)
 
 
-def init_db():
-    """应用启动时根据模型自动建表（开发阶段使用，生产建议用 Alembic 迁移）"""
-    # 必须导入模型，否则 metadata 中无表定义，create_all 不会建表
-    from app.models.book import Book  # noqa: F401
-    from app.models.gift import Gift  # noqa: F401
-    from app.models.user import User  # noqa: F401
-    from app.models.wish import Wish  # noqa: F401
-    from app.models.drift import Drift  # noqa: F401
+# 不再使用init_db，使用Alembic迁移
+# def init_db():
+#     """应用启动时根据模型自动建表（开发阶段使用，生产建议用 Alembic 迁移）"""
+#     # 必须导入模型，否则 metadata 中无表定义，create_all 不会建表
+#     from app.models.book import Book  # noqa: F401
+#     from app.models.gift import Gift  # noqa: F401
+#     from app.models.user import User  # noqa: F401
+#     from app.models.wish import Wish  # noqa: F401
+#     from app.models.drift import Drift  # noqa: F401
 
-    SQLModel.metadata.create_all(engine)
+#     SQLModel.metadata.create_all(engine)
 
 
 # 获取数据库会话，供路由通过 Depends(get_session) 注入使用

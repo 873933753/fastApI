@@ -2,11 +2,12 @@ from app.libs.http_client import HTTP
 
 import os
 from app.setting import DEFAULT_PAGE_SIZE
+from app.secure import ISBN_KEY
 
 # 通过 secure 加载 .env + .env.{APP_ENV}
 import app.secure  # noqa: F401
 
-APP_KEY = os.getenv("AppKey")
+APP_KEY = ISBN_KEY
 
 
 # 这里是根据关键字和ISBN搜索图书的类

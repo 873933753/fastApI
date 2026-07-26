@@ -1,5 +1,3 @@
-
-
 # 单本书籍信息包装模型
 class BookViewModel:
     def __init__(self, book_data):

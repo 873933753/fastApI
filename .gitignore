@@ -7,5 +7,10 @@ venv/
 .env.staging
 .env.prod
 .env.local
-docs/
+# 文档默认忽略；企业级/实施计划入库
+docs/*
+# !docs/plan/
+# !docs/plan/**
+
+# 测试：以 fisher/tests 为准入库；根目录 tests/ 仍忽略（若存在）
 tests/

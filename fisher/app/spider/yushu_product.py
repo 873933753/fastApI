@@ -1,13 +1,13 @@
 from app.libs.http_client import HTTP, HttpResult
 from app.libs.exceptions import SpiderError
 
-import os
 from app.setting import DEFAULT_PAGE_SIZE
+from app.secure import ISBN_KEY
 
 # 通过 secure 加载 .env + .env.{APP_ENV}
 import app.secure  # noqa: F401
 
-APP_KEY = os.getenv("AppKey")
+APP_KEY = ISBN_KEY
 
 
 def _to_int(value, default=0):
