@@ -40,6 +40,7 @@ services:
     container_name: fisher-app-1
     ports:
       - "8000:8000"
+    # env_file：将 .env.docker 中的环境变量导入到容器中
     env_file:
       - .env.docker                  # 相对本 compose 文件：docker/.env.docker
     # depends_on，等 db、redis 健康后再启动 app
