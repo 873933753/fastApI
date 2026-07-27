@@ -12,6 +12,8 @@ from pydantic import (
 def _strip_required_email(v: str) -> str:
     v = (v or "").strip()
     if not v:
+        # ValueError 是 Python 内置的异常类型，表示值错误或异常
+        # 422
         raise ValueError("请输入正确的邮箱")
     return v
 
